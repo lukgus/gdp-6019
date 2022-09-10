@@ -35,7 +35,7 @@ void TestVector3Implementations()
 		std::cout << "Incorrect!\n";
 
 	// operator-
-	result = vA + vB;
+	result = vA - vB;
 	std::cout << "vA - vB = ";
 	PrintVector(result);
 	std::cout << "\n";
@@ -114,6 +114,7 @@ int main(int argc, char** argv)
 {
 	TestVector3Implementations();
 
+	system("Pause");
 
 	// Return 0 for success
 	return 0;
