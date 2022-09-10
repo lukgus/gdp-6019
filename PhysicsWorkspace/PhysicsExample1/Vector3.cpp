@@ -74,65 +74,56 @@ Vector3 Vector3::operator+(const Vector3& rhs) {
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator-(const Vector3& rhs) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator*(const float& scalar) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x * scalar, y * scalar, z * scalar);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator/(const float& scalar) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x / scalar, y / scalar, z / scalar);
 }
 
 // Add Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator+=(const Vector3& rhs) {
-
-	// TODO
-
+	x += rhs.x;
+	y += rhs.y;
+	z += rhs.z;
 }
 
 // Subtract Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator-=(const Vector3& rhs) {
-
-	// TODO
-
+	x -= rhs.x;
+	y -= rhs.y;
+	z -= rhs.z;
 }
 
 // Multiply Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator*=(const float& scalar) {
-
-	// TODO
-
+	x *= scalar;
+	y *= scalar;
+	z *= scalar;
 }
 
 // Division Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator/=(const float& scalar) {
-
-	// TODO
-
+	x /= scalar;
+	y /= scalar;
+	z /= scalar;
 }
 
