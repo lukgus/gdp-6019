@@ -1,4 +1,5 @@
 #include "Vector3.h"
+#include <cmath>
 
 // Default Constructor
 // Accepts no parameters
@@ -70,65 +71,79 @@ Vector3 Vector3::operator+(const Vector3& rhs) {
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator-(const Vector3& rhs) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator*(const float& scalar) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x * scalar, y * scalar, z * scalar);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
 Vector3 Vector3::operator/(const float& scalar) {
-
-	// TODO
-
-	return Vector3();
+	return Vector3(x / scalar, y / scalar, z / scalar);
 }
 
 // Add Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator+=(const Vector3& rhs) {
-
-	// TODO
-
+	x += rhs.x;
+	y += rhs.y;
+	z += rhs.z;
 }
 
 // Subtract Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator-=(const Vector3& rhs) {
-
-	// TODO
-
+	x -= rhs.x;
+	y -= rhs.y;
+	z -= rhs.z;
 }
 
 // Multiply Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator*=(const float& scalar) {
-
-	// TODO
-
+	x *= scalar;
+	y *= scalar;
+	z *= scalar;
 }
 
 // Division Assignment Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // no return, values are changed internally
 void Vector3::operator/=(const float& scalar) {
-
-	// TODO
-
+	x /= scalar;
+	y /= scalar;
+	z /= scalar;
 }
 
+// Normalize changes the values of the vector to be 
+// a unit length
+void Vector3::Normalize() {
+	float m = Magnitude();
+	x /= m;
+	y /= m;
+	z /= m;
+}
+
+// Magnitude will return the length of the vector
+float Vector3::Magnitude() {
+	return sqrt(x * x + y * y + z * z);
+}
+// Inverse will invert the direction of the vector
+Vector3 Vector3::Inverse() {
+	// this  <-- pointer
+	// *this <-- dereferenced pointer
+	// this = Vector3*   pointer of type
+	// *this = Vector3   type
+	//return *this * -1.f;
+
+	return Vector3(x, y, z) * -1.f;
+}
