@@ -3,6 +3,11 @@
 #include "Vector3.h"
 #include "Particle.h"
 
+void PrintParticleInfo(const Particle& p) {
+	std::cout << "Velocity: " << p.velocity.y << "\nPosition: " << p.position.y << "\n\n";
+}
+
+
 void VectorTest() {
 	Vector3 v(2, 3, 4);
 	float mag = v.Magnitude();
@@ -25,7 +30,7 @@ void ParticleTest() {
 
 	while (p.position.y >= 0) {
 		p.Integrate(0.1f);
-		std::cout << p.position.y << "\n";
+		PrintParticleInfo(p);
 	}
 }
 
