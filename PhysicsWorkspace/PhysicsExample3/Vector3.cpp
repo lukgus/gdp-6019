@@ -63,28 +63,28 @@ Vector3& Vector3::operator=(const Vector3& rhs) {
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
-Vector3 Vector3::operator+(const Vector3& rhs) {
+Vector3 Vector3::operator+(const Vector3& rhs) const {
 	return Vector3(x + rhs.x, y + rhs.y, z + rhs.z);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
-Vector3 Vector3::operator-(const Vector3& rhs) {
+Vector3 Vector3::operator-(const Vector3& rhs) const {
 	return Vector3(x - rhs.x, y - rhs.y, z - rhs.z);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
-Vector3 Vector3::operator*(const float& scalar) {
+Vector3 Vector3::operator*(const float& scalar) const {
 	return Vector3(x * scalar, y * scalar, z * scalar);
 }
 
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
-Vector3 Vector3::operator/(const float& scalar) {
+Vector3 Vector3::operator/(const float& scalar) const {
 	return Vector3(x / scalar, y / scalar, z / scalar);
 }
 
@@ -122,6 +122,14 @@ void Vector3::operator/=(const float& scalar) {
 	x /= scalar;
 	y /= scalar;
 	z /= scalar;
+}
+
+// Add Scaled Vector
+// Adds a vector that is scaled by a provided scalar to
+// this vector.
+void Vector3::addScaledVector(const Vector3& vector, float scalar)
+{
+	*this += vector * scalar;
 }
 
 // Normalize changes the values of the vector to be 

@@ -5,6 +5,9 @@
 class Particle {
 	// Private area
 public:
+	Particle();
+	~Particle();
+
 	Vector3 position;
 	Vector3 velocity;
 	Vector3 acceleration;

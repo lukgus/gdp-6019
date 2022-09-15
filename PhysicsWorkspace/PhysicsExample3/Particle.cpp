@@ -1,6 +1,18 @@
 #include "Particle.h"
 #include <iostream>
 
+Particle::Particle()
+	: position(0.0f)
+	, velocity(0.0f)
+	, acceleration(0.0f)
+	, damping(1.0f)
+	, mass(1.0f)
+{
+}
+
+Particle::~Particle() {
+}
+
 // NewPosition = OldPosition + Velocity * ChangeInTime
 // 
 // p1 = p0 + v*dt
@@ -26,6 +38,11 @@ void Particle::PrintInfo() {
 }
 
 void Particle::Integrate(float dt) {
-	velocity = velocity + acceleration * dt;
-	position = position + velocity * dt;
+	//velocity = velocity + acceleration * dt;
+	//velocity *= damping;
+	//position = position + velocity * dt;
+
+	velocity.addScaledVector(acceleration, dt);
+	velocity *= damping;
+	position.addScaledVector(velocity, dt);
 }
