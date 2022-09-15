@@ -4,16 +4,12 @@
 
 class Tank {
 public:
-	Tank() {}
+	Tank() : position(0.0f), radius(1.0f) {}
 	~Tank() {}
 
 	Vector3 position;
 	float radius;
 };
-
-
-
-
 
 void ParticleManagerExample(int xVelocity, int yVelocity) {
 	Tank enemyTank;
