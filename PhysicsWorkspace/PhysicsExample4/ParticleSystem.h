@@ -19,6 +19,11 @@ public:
 	void Integrate(float duration);
 	void PrintParticleInfo();
 
+	Vector3 MinVelocity;
+	Vector3 MaxVelocity;
+	float MinAgeMilliseconds;
+	float MaxAgeMilliseconds;
+
 private:
 	// unsigned int m_NumParticles;
 	std::vector<Particle> m_Particles;

@@ -1,6 +1,8 @@
 #include "Particle.h"
 #include <iostream>
 
+//#define PRINT_DEBUG_INFO
+
 Particle::Particle()
 	: position(0.0f)
 	, velocity(0.0f)
@@ -9,19 +11,27 @@ Particle::Particle()
 	, mass(1.0f)
 	, age(-1.0f)
 {
+#ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle();\n");
+#endif
 }
 
 Particle::~Particle() {
+#ifdef PRINT_DEBUG_INFO
 	printf("Particle::~Particle();\n");
+#endif
 }
 
 Particle::Particle(const Particle& particle) {
+#ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle(const Particle& particle);\n");
+#endif
 }
 
 Particle Particle::operator=(const Particle& particle) {
+#ifdef PRINT_DEBUG_INFO
 	printf("Particle::operator=();\n");
+#endif
 	return Particle();
 }
 
@@ -45,9 +55,11 @@ Particle Particle::operator=(const Particle& particle) {
 //
 // velocity = velocity + acceleration * dt;
 void Particle::PrintInfo() {
+#ifdef PRINT_DEBUG_INFO
 	std::cout << "-----------------\n";
 	std::cout << "Velocity(" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
 	std::cout << "Position(" << position.x << ", " << position.y << ", " << position.z << ")\n";
+#endif
 }
 
 void Particle::Integrate(float dt) {

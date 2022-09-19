@@ -1,5 +1,6 @@
 #include "ParticleSystem.h"
-
+#include <random>
+#include <ctime>
 
 void ParticleSystemExample() {
 	ParticleSystem particleSystem;
@@ -7,7 +8,7 @@ void ParticleSystemExample() {
 
 	Vector3 up(0.0f, 1.0f, 0.0f);
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10; i++) {
 		particleSystem.CreateParticle(up);
 	}
 
@@ -32,8 +33,6 @@ struct Vec {
 	}
 };
 
-
-
 void VectorExample() {
 	std::vector<Vec> m_VecPointers;
 	m_VecPointers.resize(4);
@@ -45,6 +44,10 @@ void VectorExample() {
 }
 
 int main(int argc, char** argv) {
+	// https://en.cppreference.com/w/cpp/numeric/random/srand
+	// https://en.cppreference.com/w/cpp/chrono/c/time
+	srand(time(0));
+
 	ParticleSystemExample();
 
 	return 0;
