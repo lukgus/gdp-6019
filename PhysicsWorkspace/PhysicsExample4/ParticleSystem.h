@@ -20,7 +20,7 @@ public:
 	void PrintParticleInfo();
 
 private:
-	unsigned int m_NumParticles;
+	// unsigned int m_NumParticles;
 	std::vector<Particle> m_Particles;
 	Vector3 m_Position;
 };

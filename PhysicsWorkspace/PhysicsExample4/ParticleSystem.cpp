@@ -19,17 +19,22 @@ void ParticleSystem::GenerateParticles(unsigned int count) {
 
 void ParticleSystem::CreateParticle (
 	const Vector3& velocity) {
-	if (m_NumParticles >= m_Particles.size()) {
-		printf("ParticleSystem::CreateParticle Maximum number of particles already created!\n");
-		return;
+	//if (m_NumParticles >= m_Particles.size()) {
+	//	printf("ParticleSystem::CreateParticle Maximum number of particles already created!\n");
+	//	return;
+	//}
+
+	for (int i = 0; i < m_Particles.size(); i++) {
+		Particle& p = m_Particles[i];
+
+		if (p.age <= 0.f) {
+			p.velocity = velocity;
+			p.position = m_Position;
+			p.age = 1.f;
+		}
 	}
 
-	Particle& p = m_Particles[m_NumParticles];
-	p.velocity = velocity;
-	p.position = m_Position;
-	p.age = 1.f;
-
-	m_NumParticles++;
+	// m_NumParticles++;
 }
 
 void ParticleSystem::Integrate(
