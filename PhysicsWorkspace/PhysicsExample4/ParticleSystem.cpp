@@ -4,8 +4,7 @@ ParticleSystem::ParticleSystem()
 	: ParticleSystem(Vector3()) {
 }
 
-ParticleSystem::ParticleSystem(const Vector3& position)
-	: m_NumParticles(0) {
+ParticleSystem::ParticleSystem(const Vector3& position) {
 	// m_Particles.reserve();
 	// m_Particles.resize();
 }
@@ -24,14 +23,25 @@ void ParticleSystem::CreateParticle (
 	//	return;
 	//}
 
-	for (int i = 0; i < m_Particles.size(); i++) {
+	bool particleCreated = false;
+	// NOTE: You can use an index to circularly loop the vector
+	// instead of starting from 0.
+	// lastUsedIndex;
+	int i;
+	for (i = 0; i < m_Particles.size(); i++) {
 		Particle& p = m_Particles[i];
-
 		if (p.age <= 0.f) {
 			p.velocity = velocity;
 			p.position = m_Position;
 			p.age = 1.f;
+			particleCreated = true;
+			break;
 		}
+	}
+
+	if (!particleCreated) {
+		printf("ParticleSystem::CreateParticle Maximum number of particles already created!\n");
+		return;
 	}
 
 	// m_NumParticles++;
@@ -40,12 +50,18 @@ void ParticleSystem::CreateParticle (
 void ParticleSystem::Integrate(
 	float duration) {
 	for (int i = 0; i < m_Particles.size(); i++) {
-		m_Particles[i].Integrate(duration);
+		Particle& p = m_Particles[i];
+		if (p.age > 0.f) {
+			p.Integrate(duration);
+		}
 	}
 }
 
 void ParticleSystem::PrintParticleInfo() {
 	for (int i = 0; i < m_Particles.size(); i++) {
-		m_Particles[i].PrintInfo();
+		Particle& p = m_Particles[i];
+		if (p.age > 0.f) {
+			p.PrintInfo();
+		}
 	}
 }

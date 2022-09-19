@@ -6,6 +6,7 @@ void ParticleSystemExample() {
 	particleSystem.GenerateParticles(100000);
 
 	Vector3 up(0.0f, 1.0f, 0.0f);
+
 	for (int i = 0; i < 1000; i++) {
 		particleSystem.CreateParticle(up);
 	}
