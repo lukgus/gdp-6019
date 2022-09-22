@@ -10,14 +10,18 @@ public:
 	Particle(const Particle& particle);
 	Particle operator=(const Particle& particle);
 
+	void ApplyForce(const Vector3& direction);
+
 	Vector3 position;
 	Vector3 velocity;
 	Vector3 acceleration;
 
+	Vector3 force;
+
 	float age;
 
 	float damping;
-	float mass;
+	float mass;					// f = ma
 
 	void PrintInfo();
 
