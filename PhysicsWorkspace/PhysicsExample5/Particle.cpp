@@ -7,7 +7,7 @@ Particle::Particle()
 	: position(0.0f)
 	, velocity(0.0f)
 	, acceleration(0.0f)
-	, damping(0.95f)
+	, damping(0.99f)
 	, invMass(1.0f)
 {
 #ifdef PRINT_DEBUG_INFO

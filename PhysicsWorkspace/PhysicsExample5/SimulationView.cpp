@@ -47,7 +47,7 @@ void SimulationView::Initialize(){
 	m_Ball.gameObject->Renderer.MaterialId = sphereMaterialId;
 	m_Ball.gameObject->Renderer.MeshId = sphereModelId;
 	m_Ball.gameObject->Scale = glm::vec3(1, 1, 1);
-	m_Ball.gameObject->Position = glm::vec3(0, 2, 0);
+	m_Ball.particle->position = Vector3(0, 2, 0);
 }
 
 void SimulationView::Destroy(){
@@ -56,7 +56,14 @@ void SimulationView::Destroy(){
 
 void SimulationView::Update() {
 	// Typically moved to a UserInput Section
-	m_Ball.particle->ApplyForce(Vector3(-1, 0, 0));
+	if (GDP_IsKeyHeldDown('a'))
+		m_Ball.particle->ApplyForce(Vector3(1, 0, 0));
+	if (GDP_IsKeyHeldDown('d'))
+		m_Ball.particle->ApplyForce(Vector3(-1, 0, 0));
+	if (GDP_IsKeyHeldDown('w'))
+		m_Ball.particle->ApplyForce(Vector3(0, 0, 1));
+	if (GDP_IsKeyHeldDown('s'))
+		m_Ball.particle->ApplyForce(Vector3(0, 0, -1));
 
 	// Typically in a World Update Step
 
