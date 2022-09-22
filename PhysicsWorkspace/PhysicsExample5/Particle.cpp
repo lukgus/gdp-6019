@@ -4,11 +4,17 @@
 //#define PRINT_DEBUG_INFO
 
 Particle::Particle()
-	: position(0.0f)
+	: Particle(Vector3())
+{
+}
+
+Particle::Particle(const Vector3& position)
+	: position(position)
 	, velocity(0.0f)
 	, acceleration(0.0f)
 	, damping(0.99f)
 	, invMass(1.0f)
+	, m_IsStatic(false)
 {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle();\n");
@@ -71,7 +77,7 @@ void Particle::Integrate(float dt) {
 	// a = f*invMass;
 
 	// 0 or negative mass object will be a "static" object.
-	if (invMass <= 0)
+	if (invMass <= 0 || m_IsStatic)
 		return;
 
 	acceleration = force * invMass;

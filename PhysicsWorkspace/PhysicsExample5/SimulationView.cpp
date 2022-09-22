@@ -41,13 +41,12 @@ void SimulationView::Initialize(){
 	GDP_CreateMaterial(sphereMaterialId, sphereTextureId, color(1, 0, 0));
 
 	// Create our ball
-	m_Ball.particle = m_PhysicsSystem.CreateParticle();
+	m_Ball.particle = m_PhysicsSystem.CreateParticle(Vector3(0, 2, 0));
 	m_Ball.gameObject = GDP_CreateGameObject();
 	m_Ball.gameObject->Renderer.ShaderId = 1;
 	m_Ball.gameObject->Renderer.MaterialId = sphereMaterialId;
 	m_Ball.gameObject->Renderer.MeshId = sphereModelId;
 	m_Ball.gameObject->Scale = glm::vec3(1, 1, 1);
-	m_Ball.particle->position = Vector3(0, 2, 0);
 }
 
 void SimulationView::Destroy(){
@@ -72,10 +71,8 @@ void SimulationView::Update() {
 	m_PhysicsSystem.UpdateStep(0.01f);
 
 	// Update the Visual object from the Physics object
-	m_Ball.gameObject->Position = glm::vec3(
-		m_Ball.particle->position.x,
-		m_Ball.particle->position.y,
-		m_Ball.particle->position.z);
+	Vector3 p = m_Ball.particle->GetPosition();
+	m_Ball.gameObject->Position = glm::vec3(p.x, p.y, p.z);
 }
 
 //void SimulationView::AddGameDataToMap(GameObjectData& data) {

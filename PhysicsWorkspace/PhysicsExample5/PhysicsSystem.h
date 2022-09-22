@@ -9,7 +9,7 @@ public:
 	PhysicsSystem();
 	~PhysicsSystem();
 
-	Particle* CreateParticle();
+	Particle* CreateParticle(const Vector3& position);
 	void UpdateStep(float duration);
 
 private:
