@@ -7,6 +7,9 @@ using namespace gdp;
 #include <vector>
 #include <string>
 
+#include "PhysicsSystem.h"
+#include "Ball.h"
+
 typedef glm::vec3 color;
 
 //struct GameObjectData {
@@ -30,4 +33,6 @@ private:
 
 	//std::map<std::string, GameObjectData> m_GameObjectDataMap;
 
+	PhysicsSystem m_PhysicsSystem;
+	Ball m_Ball;
 };

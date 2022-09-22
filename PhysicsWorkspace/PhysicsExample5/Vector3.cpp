@@ -50,6 +50,16 @@ Vector3::Vector3(const Vector3& rhs)
 	z = rhs.z;
 }
 
+// Set
+// Sets the vector values to the provided values
+// returns nothing
+void Vector3::Set(float newX, float newY, float newZ)
+{
+	x = newX;
+	y = newY;
+	z = newZ;
+}
+
 // Assignment Operator Overload
 // Accepts a reference to another Vector3
 // Returns a refernce to the new Vector3

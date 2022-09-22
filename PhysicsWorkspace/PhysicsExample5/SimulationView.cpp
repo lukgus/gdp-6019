@@ -41,21 +41,34 @@ void SimulationView::Initialize(){
 	GDP_CreateMaterial(sphereMaterialId, sphereTextureId, color(1, 0, 0));
 
 	// Create our ball
-	GameObject* ball = GDP_CreateGameObject();
-	ball->Renderer.ShaderId = 1;
-	ball->Renderer.MaterialId = sphereMaterialId;
-	ball->Renderer.MeshId = sphereModelId;
-	ball->Scale = glm::vec3(1, 1, 1);
-	ball->Position = glm::vec3(0, 2, 0);
-
+	m_Ball.particle = m_PhysicsSystem.CreateParticle();
+	m_Ball.gameObject = GDP_CreateGameObject();
+	m_Ball.gameObject->Renderer.ShaderId = 1;
+	m_Ball.gameObject->Renderer.MaterialId = sphereMaterialId;
+	m_Ball.gameObject->Renderer.MeshId = sphereModelId;
+	m_Ball.gameObject->Scale = glm::vec3(1, 1, 1);
+	m_Ball.gameObject->Position = glm::vec3(0, 2, 0);
 }
 
 void SimulationView::Destroy(){
 
 }
 
-void SimulationView::Update(){
+void SimulationView::Update() {
+	// Typically moved to a UserInput Section
+	m_Ball.particle->ApplyForce(Vector3(-1, 0, 0));
 
+	// Typically in a World Update Step
+
+
+	// System/Engine update step
+	m_PhysicsSystem.UpdateStep(0.01f);
+
+	// Update the Visual object from the Physics object
+	m_Ball.gameObject->Position = glm::vec3(
+		m_Ball.particle->position.x,
+		m_Ball.particle->position.y,
+		m_Ball.particle->position.z);
 }
 
 //void SimulationView::AddGameDataToMap(GameObjectData& data) {

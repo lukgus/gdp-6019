@@ -7,9 +7,8 @@ Particle::Particle()
 	: position(0.0f)
 	, velocity(0.0f)
 	, acceleration(0.0f)
-	, damping(1.0f)
-	, mass(1.0f)
-	, age(-1.0f)
+	, damping(0.95f)
+	, invMass(1.0f)
 {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle();\n");
@@ -67,9 +66,25 @@ void Particle::Integrate(float dt) {
 	//velocity *= damping;
 	//position = position + velocity * dt;
 
+	// f = ma  force = mass * acceleration
+	// a = f/m
+	// a = f*invMass;
+
+	// 0 or negative mass object will be a "static" object.
+	if (invMass <= 0)
+		return;
+
+	acceleration = force * invMass;
 	velocity.addScaledVector(acceleration, dt);
+
 	velocity *= damping;
 	position.addScaledVector(velocity, dt);
+}
 
-	age -= dt;
+void Particle::ApplyForce(const Vector3& direction) {
+	force += direction;
+}
+
+void Particle::KillAllForces() {
+	force.Set(0.f, 0.f, 0.f);
 }

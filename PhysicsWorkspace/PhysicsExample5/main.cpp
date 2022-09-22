@@ -14,6 +14,7 @@ void Update() {
 }
 
 int main(int argc, char** argv) {
+
 	GDP_Initialize();
 	GDP_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	GDP_UpdateCallback(&Update);

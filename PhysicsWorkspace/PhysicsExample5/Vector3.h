@@ -31,6 +31,11 @@ public:
 	// returns nothing
 	Vector3(const Vector3& rhs);
 
+	// Set
+	// Sets the vector values to the provided values
+	// returns nothing
+	void Set(float newX, float newY, float newZ);
+
 	// Assignment Operator Overload
 	// Accepts a reference to another Vector3
 	// Returns a refernce to the new Vector3
