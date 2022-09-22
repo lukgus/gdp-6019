@@ -41,7 +41,7 @@ void SimulationView::Initialize(){
 	GDP_CreateMaterial(sphereMaterialId, sphereTextureId, color(1, 0, 0));
 
 	// Create our ball
-	m_Ball.particle = m_PhysicsSystem.CreateParticle(Vector3(0, 2, 0));
+	m_Ball.particle = m_PhysicsSystem.CreateParticle(Vector3(0, 10, 0));
 	m_Ball.gameObject = GDP_CreateGameObject();
 	m_Ball.gameObject->Renderer.ShaderId = 1;
 	m_Ball.gameObject->Renderer.MaterialId = sphereMaterialId;

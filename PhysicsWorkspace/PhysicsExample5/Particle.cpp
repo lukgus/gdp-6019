@@ -80,11 +80,19 @@ void Particle::Integrate(float dt) {
 	if (invMass <= 0 || m_IsStatic)
 		return;
 
+
 	acceleration = force * invMass;
 	velocity.addScaledVector(acceleration, dt);
 
 	velocity *= damping;
 	position.addScaledVector(velocity, dt);
+
+	float radius = 1;
+	if (position.y <= radius) {
+		position.y = radius;
+		// Deal with velocity
+		velocity.y = abs(velocity.y);
+	}
 }
 
 void Particle::ApplyForce(const Vector3& direction) {

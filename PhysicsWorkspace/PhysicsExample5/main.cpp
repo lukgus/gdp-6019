@@ -1,5 +1,6 @@
 #include <gdp/Engine.h>
 #include "SimulationView.h"
+
 using namespace gdp;
 SimulationView g_View;
 
