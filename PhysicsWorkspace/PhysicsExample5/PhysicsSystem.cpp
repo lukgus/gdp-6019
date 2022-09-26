@@ -20,7 +20,7 @@ void PhysicsSystem::UpdateStep(float duration) {
 	size_t numParticles = m_Particles.size();
 
 	for (int i = 0; i < numParticles; i++) {
-		m_Particles[i]->ApplyForce(Vector3(0, -9.81f, 0));
+		m_Particles[i]->ApplyForce(Vector3(0, -0.0981f, 0));
 	}
 
 	for (int i = 0; i < numParticles; i++) {
