@@ -47,19 +47,24 @@ void Update() {
 	// OR Update every 10 update calls
 	// OR Update # objects / 10 to update all within 10 update calls.
 
-	//if (g_CurrentTime >= g_LastCallOnUpdate + FRAME_RATE) {
-	WaitToUpdate--;
-	if (WaitToUpdate <= 0)
-	{
-		WaitToUpdate = 10;
+	if (g_CurrentTime >= g_LastCallOnUpdate + FRAME_RATE) {
+	//WaitToUpdate--;
+	//if (WaitToUpdate <= 0)
+	//{
+	//	WaitToUpdate = 10;
 		double elapsedUpdateTime = g_CurrentTime - g_LastCallOnUpdate;
-		printf("Updating at %2.3f with %2.3f elapsed\n", g_CurrentTime, elapsedUpdateTime);
+		//printf("Updating at %2.3f with %2.3f elapsed\n", g_CurrentTime, elapsedUpdateTime);
 		g_LastCallOnUpdate = g_CurrentTime;
 
+		while (elapsedUpdateTime > 0.1) {
+			printf("ElapsedUpdateTimeIsTooBig!!!\n");
+			g_View.Update(elapsedUpdateTime);
+			elapsedUpdateTime -= 0.1;
+		}
 		g_View.Update(elapsedUpdateTime);
 	}
 	else {
-		printf(".");
+		//printf(".");
 	}
 }
 
@@ -70,7 +75,7 @@ int main(int argc, char** argv) {
 	GDP_UpdateCallback(&Update);
 
 	Time::Update();
-	g_View.Initialize();
+	g_View.Initialize(3);
 	Time::Update();
 	GDP_Run();
 

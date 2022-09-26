@@ -12,7 +12,7 @@ Particle::Particle(const Vector3& position)
 	: position(position)
 	, velocity(0.0f)
 	, acceleration(0.0f)
-	, damping(0.8f)
+	, damping(0.98f)
 	, invMass(1.0f)
 	, m_IsStatic(false)
 {
@@ -86,11 +86,12 @@ void Particle::Integrate(float dt) {
 
 	position.addScaledVector(velocity, dt);
 
+	velocity *= damping;
+
 	float radius = 1;
 	if (position.y <= radius) {
 		position.y = radius;
 		// Deal with velocity
-		velocity *= damping;
 		velocity.y = abs(velocity.y);
 	}
 }

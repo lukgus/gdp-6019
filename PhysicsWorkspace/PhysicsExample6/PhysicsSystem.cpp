@@ -19,11 +19,20 @@ Particle* PhysicsSystem::CreateParticle(const Vector3& position) {
 	return particle;
 }
 
+void PhysicsSystem::AddSpring(Spring* spring) {
+	m_Springs.push_back(spring);
+}
+
 void PhysicsSystem::UpdateStep(float duration) {
 	size_t numParticles = m_Particles.size();
 
 	for (int i = 0; i < numParticles; i++) {
-		m_Particles[i]->ApplyForce(Vector3(0, -98.1f, 0));
+		/* Gravity */
+		m_Particles[i]->ApplyForce(Vector3(0, -9.81f, 0));
+	}
+
+	for (int i = 0; i < m_Springs.size(); i++) {
+		m_Springs[i]->ApplyForces(duration);
 	}
 
 	for (int i = 0; i < numParticles; i++) {

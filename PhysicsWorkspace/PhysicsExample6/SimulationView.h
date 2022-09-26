@@ -22,17 +22,23 @@ public:
 	SimulationView();
 	~SimulationView();
 
-	void Initialize();
+	void Initialize(int DemoId);
 	void Destroy();
 
 	void Update(double dt);
-
 private:
+	void Demo1();
+	void Demo2();
+	void Demo3();
+
 	//void AddGameDataToMap(GameObjectData& data);
 	//GameObject* CreateObjectByType(const std::string& type);
 
 	//std::map<std::string, GameObjectData> m_GameObjectDataMap;
 
 	PhysicsSystem m_PhysicsSystem;
-	Ball m_Ball;
+	Ball m_ControlledBall;
+	Ball m_OtherBall;
+
+	std::vector<Ball> m_Balls;
 };
