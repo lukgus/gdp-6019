@@ -97,6 +97,9 @@ void Particle::Integrate(float dt) {
 }
 
 void Particle::ApplyForce(const Vector3& direction) {
+	if (invMass <= 0 || m_IsStatic)
+		return;
+
 	force += direction;
 }
 
