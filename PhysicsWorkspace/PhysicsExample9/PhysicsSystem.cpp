@@ -128,7 +128,7 @@ bool PhysicsSystem::CollisionTest(const Vector3& posA, iShape* shapeA, const Vec
 		if (shapeB->GetType() == SHAPE_TYPE_AABB) {}
 
 		else if (shapeB->GetType() == SHAPE_TYPE_SPHERE) {
-			detectedCollision = CollisionTest(posB, dynamic_cast<Sphere*>(shapeB), posB, dynamic_cast<Triangle*>(shapeA));
+			detectedCollision = CollisionTest(posB, dynamic_cast<Sphere*>(shapeB), posA, dynamic_cast<Triangle*>(shapeA));
 		}
 
 		else if (shapeB->GetType() == SHAPE_TYPE_TRIANGLE) {}

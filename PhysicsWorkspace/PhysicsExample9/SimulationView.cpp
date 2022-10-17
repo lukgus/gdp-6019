@@ -29,14 +29,16 @@ void SimulationView::Initialize(int DemoId){
 	float max[3] = { 20.f, 1.f, 20.f };
 	AABB* groundAABB = new AABB(min, max);
 
+	Triangle* groundTriangle = new Triangle(Point(-20, 0, 20), Point(-20, -10, -20), Point(20, 0, -20));
+
 	BoundingBox* groundBoundingBox = new BoundingBox();
 	groundBoundingBox->centerPoint.Set(0.0f, 0.0f, 0.0f);
 	groundBoundingBox->halfExtents.Set(20.0f, 1.0f, 20.0f);
 	groundBoundingBox->minPoints.Set(min[0], min[1], min[2]);
 	groundBoundingBox->maxPoints.Set(max[0], max[1], max[2]);
 
-	PhysicsObject* physicsGround = m_PhysicsSystem.CreatePhysicsObject(Vector3(0, 0, 0), groundAABB);
-	physicsGround->pShape = groundAABB;
+	PhysicsObject* physicsGround = m_PhysicsSystem.CreatePhysicsObject(Vector3(0, 0, 0), groundTriangle);
+	physicsGround->pShape = groundTriangle;
 	physicsGround->SetMass(-1.f);
 	physicsGround->pBoundingBox = groundBoundingBox;
 
@@ -46,6 +48,9 @@ void SimulationView::Initialize(int DemoId){
 	ground->Renderer.MaterialId = groundMaterialId;
 	ground->Renderer.MeshId = planeModelId;
 	ground->Scale = glm::vec3(20, 1, 20);
+
+
+
 
 	m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
 	PrepareDemo();
