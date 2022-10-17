@@ -13,8 +13,8 @@ PhysicsSystem::~PhysicsSystem() {
 	//  -> edit: Nope, use this for array of pointers
 }
 
-Particle* PhysicsSystem::CreateParticle(const Vector3& position) {
-	Particle* particle = new Particle(position);
+PhysicsObject* PhysicsSystem::CreateParticle(const Vector3& position) {
+	PhysicsObject* particle = new PhysicsObject(position);
 	m_Particles.push_back(particle);
 	return particle;
 }

@@ -2,7 +2,7 @@
 
 #include "Vector3.h"
 
-class Particle {
+class PhysicsObject {
 	// Private area
 public:
 	Vector3 position;

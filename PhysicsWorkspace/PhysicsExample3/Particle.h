@@ -2,11 +2,11 @@
 
 #include "Vector3.h"
 
-class Particle {
+class PhysicsObject {
 	// Private area
 public:
-	Particle();
-	~Particle();
+	PhysicsObject();
+	~PhysicsObject();
 
 	Vector3 position;
 	Vector3 velocity;

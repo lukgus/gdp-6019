@@ -56,10 +56,9 @@ void Update() {
 		//printf("Updating at %2.3f with %2.3f elapsed\n", g_CurrentTime, elapsedUpdateTime);
 		g_LastCallOnUpdate = g_CurrentTime;
 
-		while (elapsedUpdateTime > 0.1) {
+		if (elapsedUpdateTime > 0.1) {
 			printf("ElapsedUpdateTimeIsTooBig!!!\n");
-			g_View.Update(elapsedUpdateTime);
-			elapsedUpdateTime -= 0.1;
+			elapsedUpdateTime = 0.1;
 		}
 		g_View.Update(elapsedUpdateTime);
 	}

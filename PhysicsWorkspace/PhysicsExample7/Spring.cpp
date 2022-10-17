@@ -1,6 +1,6 @@
 #include "Spring.h"
 
-Spring::Spring(Particle* A, Particle* B, float constant, float restingLength)
+Spring::Spring(PhysicsObject* A, PhysicsObject* B, float constant, float restingLength)
 	: m_ParticleA(A)
 	, m_ParticleB(B)
 	, m_SpringConstant(constant)

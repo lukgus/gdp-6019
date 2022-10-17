@@ -1,7 +1,7 @@
 #include "Particle.h"
 #include <iostream>
 
-Particle::Particle()
+PhysicsObject::PhysicsObject()
 	: position(0.0f)
 	, velocity(0.0f)
 	, acceleration(0.0f)
@@ -10,7 +10,7 @@ Particle::Particle()
 {
 }
 
-Particle::~Particle() {
+PhysicsObject::~PhysicsObject() {
 }
 
 // NewPosition = OldPosition + Velocity * ChangeInTime
@@ -31,13 +31,13 @@ Particle::~Particle() {
 // a = acceleration
 //
 // velocity = velocity + acceleration * dt;
-void Particle::PrintInfo() {
+void PhysicsObject::PrintInfo() {
 	std::cout << "-----------------\n";
 	std::cout << "Velocity(" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
 	std::cout << "Position(" << position.x << ", " << position.y << ", " << position.z << ")\n";
 }
 
-void Particle::Integrate(float dt) {
+void PhysicsObject::Integrate(float dt) {
 	//velocity = velocity + acceleration * dt;
 	//velocity *= damping;
 	//position = position + velocity * dt;

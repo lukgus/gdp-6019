@@ -5,6 +5,6 @@
 
 class Ball {
 public:
-	Particle* particle;
+	PhysicsObject* particle;
 	gdp::GameObject* gameObject;
 };

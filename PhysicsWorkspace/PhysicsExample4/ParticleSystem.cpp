@@ -52,7 +52,7 @@ void ParticleSystem::CreateParticle (
 	// lastUsedIndex;
 	int i;
 	for (i = 0; i < m_Particles.size(); i++) {
-		Particle& p = m_Particles[i];
+		PhysicsObject& p = m_Particles[i];
 		if (p.age <= 0.f) {
 
 			// Reset the position to the default position
@@ -96,7 +96,7 @@ void ParticleSystem::CreateParticle (
 void ParticleSystem::Integrate(
 	float duration) {
 	for (int i = 0; i < m_Particles.size(); i++) {
-		Particle& p = m_Particles[i];
+		PhysicsObject& p = m_Particles[i];
 		if (p.age > 0.f) {
 			p.Integrate(duration);
 		}
@@ -105,7 +105,7 @@ void ParticleSystem::Integrate(
 
 void ParticleSystem::PrintParticleInfo() {
 	for (int i = 0; i < m_Particles.size(); i++) {
-		Particle& p = m_Particles[i];
+		PhysicsObject& p = m_Particles[i];
 		if (p.age > 0.f) {
 			p.PrintInfo();
 		}

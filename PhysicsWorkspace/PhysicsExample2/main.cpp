@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include "Particle.h"
 
-void PrintParticleInfo(const Particle& p) {
+void PrintParticleInfo(const PhysicsObject& p) {
 	std::cout << "Velocity: " << p.velocity.y << "\nPosition: " << p.position.y << "\n\n";
 }
 
@@ -23,7 +23,7 @@ void VectorTest() {
 		invV.x << ", " << invV.y << ", " << invV.z << ")\n";
 }
 void ParticleTest() {
-	Particle p;
+	PhysicsObject p;
 	p.position = Vector3(0.f);
 	p.velocity = Vector3(0.f, 5.f, 0.f);
 	p.acceleration = Vector3(0.f, -1.f, 0.f);

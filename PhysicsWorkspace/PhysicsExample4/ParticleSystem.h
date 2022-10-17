@@ -26,6 +26,6 @@ public:
 
 private:
 	// unsigned int m_NumParticles;
-	std::vector<Particle> m_Particles;
+	std::vector<PhysicsObject> m_Particles;
 	Vector3 m_Position;
 };

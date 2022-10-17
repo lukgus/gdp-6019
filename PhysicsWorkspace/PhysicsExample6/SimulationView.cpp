@@ -95,7 +95,7 @@ void SimulationView::Demo2() {
 	GDP_CreateMaterial(blockMaterialId, sphereTextureId, color(0, 0, 0));
 
 	// Create a block
-	Particle* blockParticle = m_PhysicsSystem.CreateParticle(Vector3(0, 10, 0));
+	PhysicsObject* blockParticle = m_PhysicsSystem.CreateParticle(Vector3(0, 10, 0));
 	blockParticle->SetMass(-1.f);
 	GameObject* go = GDP_CreateGameObject();
 	go->Renderer.ShaderId = 1;
@@ -137,7 +137,7 @@ void SimulationView::Demo3() {
 	GDP_CreateMaterial(blockMaterialId, sphereTextureId, color(0, 0, 0));
 
 	// Create our 2 blocks
-	Particle* blockParticle1 = m_PhysicsSystem.CreateParticle(Vector3(-5, 10, 0));
+	PhysicsObject* blockParticle1 = m_PhysicsSystem.CreateParticle(Vector3(-5, 10, 0));
 	blockParticle1->SetMass(-1.f);
 	GameObject* go1 = GDP_CreateGameObject();
 	go1->Renderer.ShaderId = 1;
@@ -147,7 +147,7 @@ void SimulationView::Demo3() {
 	Vector3 p1 = blockParticle1->GetPosition();
 	go1->Position = glm::vec3(p1.x, p1.y, p1.z);
 
-	Particle* blockParticle2 = m_PhysicsSystem.CreateParticle(Vector3(5, 10, 0));
+	PhysicsObject* blockParticle2 = m_PhysicsSystem.CreateParticle(Vector3(5, 10, 0));
 	blockParticle2->SetMass(-1.f);
 	GameObject* go2 = GDP_CreateGameObject();
 	go2->Renderer.ShaderId = 1;

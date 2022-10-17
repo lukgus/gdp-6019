@@ -10,11 +10,11 @@ public:
 	PhysicsSystem();
 	~PhysicsSystem();
 
-	Particle* CreateParticle(const Vector3& position);
+	PhysicsObject* CreateParticle(const Vector3& position);
 	void AddSpring(Spring* spring);
 	void UpdateStep(float duration);
 
 private:
-	std::vector<Particle*> m_Particles;
+	std::vector<PhysicsObject*> m_Particles;
 	std::vector<Spring*> m_Springs;
 };

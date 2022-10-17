@@ -18,7 +18,7 @@ void ParticleManagerExample(int xVelocity, int yVelocity) {
 
 	ParticleManager particleManager;
 
-	Particle& p = particleManager.CreateParticle(Vector3(0, 1, 0));
+	PhysicsObject& p = particleManager.CreateParticle(Vector3(0, 1, 0));
 	p.velocity = Vector3((float)xVelocity, (float)yVelocity, 0);
 
 	// Cannon ----->

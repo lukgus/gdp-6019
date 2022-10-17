@@ -42,14 +42,14 @@ float SqDistPointAABB(Point p, AABB b)
 	return sqDist;
 }
 
-int TestSphereAABB(Sphere s, AABB b)
+int TestSphereAABB(const Vector3&center, float radius, AABB b)
 {
 	// Compute squared distance between sphere center and AABB
-	float sqDist = SqDistPointAABB(s.Center, b);
+	float sqDist = SqDistPointAABB(center, b);
 
 	// Sphere and AABB intersect if the (squared) distance
 	// between them is less than the (squared) sphere radius
-	return sqDist <= s.Radius * s.Radius;
+	return sqDist <= radius * radius;
 }
 
 Point ClosestPtPointTriangle(Point p, Point a, Point b, Point c)
@@ -111,12 +111,12 @@ Point ClosestPtPointTriangle(Point p, Point a, Point b, Point c)
 	// = u*a +v*b + w*c, u = va * denom = 1.0f - v - w
 }
 
-int TestSphereTriangle(Sphere s, Point a, Point b, Point c, Point& p)
+int TestSphereTriangle(const Vector3& center, float radius, Vector3 a, Vector3 b, Vector3 c, Vector3& p)
 {
 	// Find point P on triangle ABC closest to the sphere center
-	p = ClosestPtPointTriangle(s.Center, a, b, c);
+	p = ClosestPtPointTriangle(center, a, b, c);
 	// Sphere and triangle intersect if the (squared) distance from sphere
 	// center to point p is less than the (squared) sphere radius
-	Vector3 v = p - s.Center;
-	return Dot(v, v) <= s.Radius * s.Radius;
+	Vector3 v = p - center;
+	return Dot(v, v) <= radius * radius;
 }

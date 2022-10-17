@@ -8,7 +8,7 @@ ParticleManager::~ParticleManager() {
 
 }
 
-Particle& ParticleManager::CreateParticle(const Vector3& position) {
+PhysicsObject& ParticleManager::CreateParticle(const Vector3& position) {
 	
 	// Assume this is a Bullet
 	// f = mass * acceleration
@@ -16,7 +16,7 @@ Particle& ParticleManager::CreateParticle(const Vector3& position) {
 	// gravity as acceleration 
 	// gravity is -9.8 m/s^2
 
-	Particle p;						// p is added onto the stack
+	PhysicsObject p;						// p is added onto the stack
 	p.position = position;
 	p.acceleration = Vector3(0.0f, -9.8f, 0.0f);	// Gravity
 	p.mass = 0.01f;

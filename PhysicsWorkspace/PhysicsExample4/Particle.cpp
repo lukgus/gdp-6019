@@ -3,7 +3,7 @@
 
 //#define PRINT_DEBUG_INFO
 
-Particle::Particle()
+PhysicsObject::PhysicsObject()
 	: position(0.0f)
 	, velocity(0.0f)
 	, acceleration(0.0f)
@@ -16,23 +16,23 @@ Particle::Particle()
 #endif
 }
 
-Particle::~Particle() {
+PhysicsObject::~PhysicsObject() {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::~Particle();\n");
 #endif
 }
 
-Particle::Particle(const Particle& particle) {
+PhysicsObject::PhysicsObject(const PhysicsObject& particle) {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle(const Particle& particle);\n");
 #endif
 }
 
-Particle Particle::operator=(const Particle& particle) {
+PhysicsObject PhysicsObject::operator=(const PhysicsObject& particle) {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::operator=();\n");
 #endif
-	return Particle();
+	return PhysicsObject();
 }
 
 
@@ -54,7 +54,7 @@ Particle Particle::operator=(const Particle& particle) {
 // a = acceleration
 //
 // velocity = velocity + acceleration * dt;
-void Particle::PrintInfo() {
+void PhysicsObject::PrintInfo() {
 #ifdef PRINT_DEBUG_INFO
 	std::cout << "-----------------\n";
 	std::cout << "Velocity(" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
@@ -62,7 +62,7 @@ void Particle::PrintInfo() {
 #endif
 }
 
-void Particle::Integrate(float dt) {
+void PhysicsObject::Integrate(float dt) {
 	//velocity = velocity + acceleration * dt;
 	//velocity *= damping;
 	//position = position + velocity * dt;

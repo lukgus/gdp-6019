@@ -3,12 +3,12 @@
 
 //#define PRINT_DEBUG_INFO
 
-Particle::Particle()
-	: Particle(Vector3())
+PhysicsObject::PhysicsObject()
+	: PhysicsObject(Vector3())
 {
 }
 
-Particle::Particle(const Vector3& position)
+PhysicsObject::PhysicsObject(const Vector3& position)
 	: position(position)
 	, velocity(0.0f)
 	, acceleration(0.0f)
@@ -21,23 +21,23 @@ Particle::Particle(const Vector3& position)
 #endif
 }
 
-Particle::~Particle() {
+PhysicsObject::~PhysicsObject() {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::~Particle();\n");
 #endif
 }
 
-Particle::Particle(const Particle& particle) {
+PhysicsObject::PhysicsObject(const PhysicsObject& particle) {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::Particle(const Particle& particle);\n");
 #endif
 }
 
-Particle Particle::operator=(const Particle& particle) {
+PhysicsObject PhysicsObject::operator=(const PhysicsObject& particle) {
 #ifdef PRINT_DEBUG_INFO
 	printf("Particle::operator=();\n");
 #endif
-	return Particle();
+	return PhysicsObject();
 }
 
 
@@ -59,7 +59,7 @@ Particle Particle::operator=(const Particle& particle) {
 // a = acceleration
 //
 // velocity = velocity + acceleration * dt;
-void Particle::PrintInfo() {
+void PhysicsObject::PrintInfo() {
 #ifdef PRINT_DEBUG_INFO
 	std::cout << "-----------------\n";
 	std::cout << "Velocity(" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
@@ -67,7 +67,7 @@ void Particle::PrintInfo() {
 #endif
 }
 
-void Particle::Integrate(float dt) {
+void PhysicsObject::Integrate(float dt) {
 	//velocity = velocity + acceleration * dt;
 	//velocity *= damping;
 	//position = position + velocity * dt;
@@ -96,13 +96,13 @@ void Particle::Integrate(float dt) {
 	}
 }
 
-void Particle::ApplyForce(const Vector3& direction) {
+void PhysicsObject::ApplyForce(const Vector3& direction) {
 	if (invMass <= 0 || m_IsStatic)
 		return;
 
 	force += direction;
 }
 
-void Particle::KillAllForces() {
+void PhysicsObject::KillAllForces() {
 	force.Set(0.f, 0.f, 0.f);
 }

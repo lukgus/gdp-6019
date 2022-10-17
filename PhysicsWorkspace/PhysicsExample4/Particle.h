@@ -2,13 +2,13 @@
 
 #include "Vector3.h"
 
-class Particle {
+class PhysicsObject {
 	// Private area
 public:
-	Particle();
-	~Particle();
-	Particle(const Particle& particle);
-	Particle operator=(const Particle& particle);
+	PhysicsObject();
+	~PhysicsObject();
+	PhysicsObject(const PhysicsObject& particle);
+	PhysicsObject operator=(const PhysicsObject& particle);
 
 	void ApplyForce(const Vector3& direction);
 

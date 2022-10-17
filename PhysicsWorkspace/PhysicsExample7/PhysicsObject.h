@@ -5,6 +5,6 @@
 
 struct PhysicsObject {
 public:
-	Particle* particle;
+	PhysicsObject* particle;
 	BoundingBox* boundingBox;
 };

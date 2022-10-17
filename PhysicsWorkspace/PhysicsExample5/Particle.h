@@ -2,14 +2,14 @@
 
 #include "Vector3.h"
 
-class Particle {
+class PhysicsObject {
 	// Private area
 public:
-	Particle();
-	Particle(const Vector3& position);
-	~Particle();
-	Particle(const Particle& particle);
-	Particle operator=(const Particle& particle);
+	PhysicsObject();
+	PhysicsObject(const Vector3& position);
+	~PhysicsObject();
+	PhysicsObject(const PhysicsObject& particle);
+	PhysicsObject operator=(const PhysicsObject& particle);
 
 	void SetMass(float mass) {
 		// If the mass is 0 or less we treat it as 
