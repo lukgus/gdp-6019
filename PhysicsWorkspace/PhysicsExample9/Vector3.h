@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/vec3.hpp>
 
 class Vector3
 {
@@ -10,6 +11,8 @@ public:
 	// Accepts no parameters
 	// Returns nothing
 	Vector3();
+
+	Vector3(const glm::vec3& v) : x(v.x), y(v.y), z(v.z) {}
 
 	// Parameterized Constructor
 	// Accepts a value to set for all axis

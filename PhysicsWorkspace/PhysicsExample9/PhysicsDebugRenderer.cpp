@@ -84,7 +84,9 @@ void PhysicsDebugRenderer::Render()
 
         unsigned int numTriangles;
         unsigned int vbo;
-        gdp::GDP_GetModelData(m_BoundingBoxModelId, numTriangles, vbo);
+        std::vector<glm::vec3> vertices;
+        std::vector<int> triangles;
+        gdp::GDP_GetModelData(m_BoundingBoxModelId, vertices, triangles, numTriangles, vbo);
         glBindVertexArray(vbo);
         glDrawElements(GL_TRIANGLES, numTriangles * 3, GL_UNSIGNED_INT, (GLvoid*)0);
 	}

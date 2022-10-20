@@ -1,6 +1,11 @@
 #include "SimulationView.h"
 
 #include <limits>
+unsigned int g_SphereModelId;
+unsigned int g_SphereMaterialId;
+unsigned int g_TreeMaterialId;
+unsigned int g_FirTreeModelId;
+unsigned int g_SphereTextureId;
 
 SimulationView::SimulationView(){
 
@@ -37,8 +42,8 @@ void SimulationView::Initialize(int DemoId){
 	groundBoundingBox->minPoints.Set(min[0], min[1], min[2]);
 	groundBoundingBox->maxPoints.Set(max[0], max[1], max[2]);
 
-	PhysicsObject* physicsGround = m_PhysicsSystem.CreatePhysicsObject(Vector3(0, 0, 0), groundTriangle);
-	physicsGround->pShape = groundTriangle;
+	PhysicsObject* physicsGround = m_PhysicsSystem.CreatePhysicsObject(Vector3(0, 0, 0), groundAABB);
+	physicsGround->pShape = groundAABB;
 	physicsGround->SetMass(-1.f);
 	physicsGround->pBoundingBox = groundBoundingBox;
 
@@ -60,26 +65,87 @@ void SimulationView::Destroy() {
 
 }
 
+void SimulationView::CreateTree(const Vector3& position, float scale) {
+	unsigned int unused1, unused2;
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
+	GDP_GetModelData(g_FirTreeModelId, vertices, triangles, unused1, unused2);
+
+	// Create our mesh inside the physics system
+	for (int i = 0; i < triangles.size(); i += 3) {
+		int indexA = i;
+		int indexB = i + 1;
+		int indexC = i + 2;
+
+		// HACK to save time from fixing the vertices returned from the GDP Graphics library
+		if (indexA + 2 >= vertices.size()) {
+			printf("Skipping creating a triangle!\n");
+			continue;
+		}
+
+		Vector3 vertexA = Vector3(vertices[indexA]) * scale + position;
+		Vector3 vertexB = Vector3(vertices[indexB]) * scale + position;
+		Vector3 vertexC = Vector3(vertices[indexC]) * scale + position;
+
+		Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+		PhysicsObject* trianglePhysObj = m_PhysicsSystem.CreatePhysicsObject(position, triangle);
+		trianglePhysObj->SetMass(-1.f);
+	}
+
+	// Create 1 Instance of the tree to be rendered
+	// While creating number of triangles x instances of Triangles
+	// for collision detection.
+	gdp::GameObject* tree = GDP_CreateGameObject();
+	tree->Position = glm::vec3(position.x, position.y, position.z);
+	tree->Renderer.ShaderId = 1;
+	tree->Renderer.MaterialId = g_TreeMaterialId;
+	tree->Renderer.MeshId = g_FirTreeModelId;
+	tree->Scale = glm::vec3(1.0f) * scale;
+
+}
+
+void SimulationView::CreateBall(const Vector3& position, float scale) {
+	Sphere* otherSphere = new Sphere(Point(0.0f, 0.0f, 0.0f), scale);
+
+	Ball newBall;
+	newBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(position, otherSphere);
+	newBall.gameObject = GDP_CreateGameObject();
+	newBall.gameObject->Renderer.ShaderId = 1;
+	newBall.gameObject->Renderer.MaterialId = g_SphereMaterialId;
+	newBall.gameObject->Renderer.MeshId = g_SphereModelId;
+	newBall.gameObject->Scale = glm::vec3(1, 1, 1) * scale;
+
+	// Create a bounding box around our ball.
+	//Vector3 halfExtents = m_BallBoundingBox.halfExtents;
+	//newBall.physicsObject->pBoundingBox = &m_BallBoundingBox;
+	//newBall.physicsObject->pBoundingBox->halfExtents = halfExtents * scale;
+
+	//m_PhysicsDebugRenderer->AddPhysicsObject(newBall.physicsObject);
+
+	m_Balls.push_back(newBall);
+}
+
 void SimulationView::PrepareDemo() {
 
 	// Create a sphere
-	unsigned int sphereModelId = -1;
-	GDP_LoadModel(sphereModelId, "assets/models/sphere.obj");
+	GDP_LoadModel(g_SphereModelId, "assets/models/sphere.obj");
+	GDP_LoadModel(g_FirTreeModelId, "assets/models/Fir_Tree.fbx");
 
 	// Load Textures
-	unsigned int sphereTextureId = -1;
-	GDP_LoadTexture(sphereTextureId, "assets/textures/white.png");
+	GDP_LoadTexture(g_SphereTextureId, "assets/textures/white.png");
 
 	// Create Material
-	unsigned int sphereMaterialId = -1;
-	GDP_CreateMaterial(sphereMaterialId, sphereTextureId, color(1, 0, 0));
+	GDP_CreateMaterial(g_SphereMaterialId, g_SphereTextureId, color(1, 0, 0));
+	GDP_CreateMaterial(g_TreeMaterialId, g_SphereTextureId, color(0, 1, 0));
 
-
-	Vector3 minPoints = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
-	Vector3 maxPoints = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
 
 	unsigned int unused1, unused2;
-	std::vector<glm::vec3> vertices = GDP_GetModelData(sphereModelId, unused1, unused2);
+
+	GDP_GetModelData(g_SphereModelId, vertices, triangles, unused1, unused2);
+	Vector3 minPoints = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	Vector3 maxPoints = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
 	for (int i = 0; i < vertices.size(); i++) {
 		glm::vec3& vertex = vertices[i];
 
@@ -135,30 +201,31 @@ void SimulationView::PrepareDemo() {
 	// Create our ground
 
 	Sphere* controlledSphere = new Sphere(Point(0.0f, 0.0f, 0.0f), 1.0f);
-	Sphere* otherSphere = new Sphere(Point(0.0f, 0.0f, 0.0f), 1.0f);
 
 	// Create our controlled ball
-	m_ControlledBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(Vector3(0, 10, 0), controlledSphere);
+	m_ControlledBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(Vector3(1, 25, 0), controlledSphere);
 	m_ControlledBall.gameObject = GDP_CreateGameObject();
 	m_ControlledBall.gameObject->Renderer.ShaderId = 1;
-	m_ControlledBall.gameObject->Renderer.MaterialId = sphereMaterialId;
-	m_ControlledBall.gameObject->Renderer.MeshId = sphereModelId;
+	m_ControlledBall.gameObject->Renderer.MaterialId = g_SphereMaterialId;
+	m_ControlledBall.gameObject->Renderer.MeshId = g_SphereModelId;
 	m_ControlledBall.gameObject->Scale = glm::vec3(1, 1, 1);
-
-	// Create our other ball
-	m_OtherBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(Vector3(3, 10, 0), otherSphere);
-	m_OtherBall.gameObject = GDP_CreateGameObject();
-	m_OtherBall.gameObject->Renderer.ShaderId = 1;
-	m_OtherBall.gameObject->Renderer.MaterialId = sphereMaterialId;
-	m_OtherBall.gameObject->Renderer.MeshId = sphereModelId;
-	m_OtherBall.gameObject->Scale = glm::vec3(1, 1, 1);
 
 	// Create a bounding box around our ball.
 	m_ControlledBall.physicsObject->pBoundingBox = &m_BallBoundingBox;
-	m_OtherBall.physicsObject->pBoundingBox = &m_BallBoundingBox;
 
-	m_PhysicsDebugRenderer->AddPhysicsObject(m_OtherBall.physicsObject);
 	m_PhysicsDebugRenderer->AddPhysicsObject(m_ControlledBall.physicsObject);
+
+	CreateTree(Vector3(0.0f), 0.025f);
+	CreateTree(Vector3(-10.0f, 0.0f, -10.0f), 0.025f);
+	CreateTree(Vector3(-10.0f, 0.0f,  10.0f), 0.025f);
+	CreateTree(Vector3( 10.0f, 0.0f, -10.0f), 0.025f);
+	CreateTree(Vector3( 10.0f, 0.0f,  10.0f), 0.025f);
+
+	for (int i = -20; i < 20; i+=3) {
+		for (int j = -20; j < 20; j+=3) {
+			CreateBall(Vector3(i, 20, j), 0.1f);
+		}
+	}
 }
 
 void SimulationView::Update(double dt) {
@@ -187,10 +254,9 @@ void SimulationView::Update(double dt) {
 		m_ControlledBall.gameObject->Position = glm::vec3(p.x, p.y, p.z);
 	}
 
-	if (m_OtherBall.physicsObject != nullptr)
-	{
-		Vector3 p = m_OtherBall.physicsObject->GetPosition();
-		m_OtherBall.gameObject->Position = glm::vec3(p.x, p.y, p.z);
+	for (int i = 0; i < m_Balls.size(); i++) {
+		Vector3 p = m_Balls[i].physicsObject->GetPosition();
+		m_Balls[i].gameObject->Position = glm::vec3(p.x, p.y, p.z);
 	}
 
 	for (int i = 0; i < m_Balls.size(); i++) {

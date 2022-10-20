@@ -27,8 +27,9 @@ namespace gdp
             unsigned int& id, const char* filepath);
         GDPENGINE_API void GDP_LoadModel(
             unsigned int& id, const char* filepath);
-        GDPENGINE_API const std::vector<glm::vec3>& GDP_GetModelData(
-            unsigned int id, unsigned int& numTriangles, unsigned int& vbo);
+        GDPENGINE_API void GDP_GetModelData(unsigned int id,
+            std::vector<glm::vec3>& vertices, std::vector<int>& triangles,
+            unsigned int& numTriangles, unsigned int& vbo);
         GDPENGINE_API void GDP_CreateMaterial(
             unsigned int& id, unsigned int textureId, const glm::vec3& color);
         GDPENGINE_API void GDP_CreateShaderProgramFromFiles(

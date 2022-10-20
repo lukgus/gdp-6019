@@ -16,6 +16,7 @@ namespace gdp
 		GLuint IndexBufferId;
 
 		std::vector<glm::vec3> vertices;
+		std::vector<int> triangles;	// 1,2,3
 
 		unsigned int NumTriangles;
 	};

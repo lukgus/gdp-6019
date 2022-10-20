@@ -31,7 +31,8 @@ public:
 	void Render();
 private:
 	void PrepareDemo();
-
+	void CreateBall(const Vector3& position, float scale);
+	void CreateTree(const Vector3& position, float scale);
 	//void AddGameDataToMap(GameObjectData& data);
 	//GameObject* CreateObjectByType(const std::string& type);
 
@@ -39,7 +40,6 @@ private:
 
 	PhysicsSystem m_PhysicsSystem;
 	Ball m_ControlledBall;
-	Ball m_OtherBall;
 
 	BoundingBox m_BallBoundingBox;
 
