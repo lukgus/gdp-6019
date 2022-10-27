@@ -65,6 +65,8 @@ void SimulationView::Destroy() {
 
 }
 
+
+
 void SimulationView::CreateTree(const Vector3& position, float scale) {
 	unsigned int unused1, unused2;
 	std::vector<glm::vec3> vertices;
@@ -225,7 +227,7 @@ void SimulationView::PrepareDemo() {
 		for (int j = -20; j < 20; j+=3) {
 			CreateBall(Vector3(i, 20, j), 0.1f);
 		}
-	}
+	}	
 }
 
 void SimulationView::Update(double dt) {

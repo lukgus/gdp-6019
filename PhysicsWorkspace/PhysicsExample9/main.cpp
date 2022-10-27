@@ -3,6 +3,66 @@
 
 #include "Time.h"
 
+
+
+// Will look at documentation in a minute.
+#include <map>
+#include <vector>
+
+int CalculateHash(const Vector3& p)
+{
+	// xxxyyyzzz
+	return ((int)p.x / 10) * 1000000
+		+ ((int)p.y / 10) * 1000
+		+ ((int)p.z / 10);
+}
+
+std::map<int, std::vector<Triangle*>> g_AABB_Map;
+void CreateAABBStructure(const Vector3& position, float scale) {
+
+	unsigned int modelId;
+	unsigned int unused1, unused2;
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
+	GDP_GetModelData(modelId, vertices, triangles, unused1, unused2);
+	for (int i = 0; i < triangles.size(); i += 3) {
+		int indexA = i;
+		int indexB = i + 1;
+		int indexC = i + 2;
+
+		Vector3 vertexA = Vector3(vertices[indexA]) * scale + position;
+		Vector3 vertexB = Vector3(vertices[indexB]) * scale + position;
+		Vector3 vertexC = Vector3(vertices[indexC]) * scale + position;
+		Triangle* triangle = new Triangle(vertexA, vertexB, vertexC);
+
+		int aabbA = CalculateHash(vertexA);
+		int aabbB = CalculateHash(vertexB);
+		int aabbC = CalculateHash(vertexC);
+
+		g_AABB_Map[aabbA].push_back(triangle);
+
+		if (aabbB != aabbA)
+			g_AABB_Map[aabbB].push_back(triangle);
+
+		if (aabbC != aabbA && aabbC != aabbB)
+			g_AABB_Map[aabbC].push_back(triangle);
+
+	}
+}
+
+void Update()
+{
+	// Check each sphere on  your object
+	//Foreach collider
+	Sphere* a = new Sphere(Point(0), 1.0f);
+
+	Vector3 position = (10, 5, 8);
+
+	int position_hash = CalculateHash(position);
+	std::vector<Triangle*> aabb_triangles = g_AABB_Map[position_hash];
+
+}
+
 using namespace gdp;
 SimulationView g_View;
 
