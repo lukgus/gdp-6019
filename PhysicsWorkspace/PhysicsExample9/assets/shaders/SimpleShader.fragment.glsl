@@ -18,5 +18,5 @@ uniform vec3 Color;
 void main(void)
 {
 	vec3 textureColor = texture(Texture00, ex_UV_x2.xy).xyz;
-	out_Colour = vec4(Color.rgb * textureColor, 1);
+	out_Colour = vec4(Color.rgb * textureColor * ex_Normal.xyz, 1);
 }

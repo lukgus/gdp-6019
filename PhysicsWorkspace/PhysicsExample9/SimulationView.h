@@ -28,11 +28,13 @@ public:
 	void Destroy();
 
 	void Update(double dt);
+	void PhysicsUpdate(double dt);
 	void Render();
 private:
 	void PrepareDemo();
 	void CreateBall(const Vector3& position, float scale);
 	void CreateTree(const Vector3& position, float scale);
+	void LoadOurShip(const std::string& filepath);
 	//void AddGameDataToMap(GameObjectData& data);
 	//GameObject* CreateObjectByType(const std::string& type);
 
@@ -45,5 +47,8 @@ private:
 
 	std::vector<Ball> m_Balls;
 
+	unsigned int m_ShipModelId;
 	PhysicsDebugRenderer* m_PhysicsDebugRenderer;
+
+	gdp::GameObject* m_BigShipGamObject;
 };

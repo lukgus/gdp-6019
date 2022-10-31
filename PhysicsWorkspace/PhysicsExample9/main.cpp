@@ -4,10 +4,10 @@
 #include "Time.h"
 
 
-
 // Will look at documentation in a minute.
 #include <map>
 #include <vector>
+#include <sstream>
 
 int CalculateHash(const Vector3& p)
 {
@@ -20,7 +20,7 @@ int CalculateHash(const Vector3& p)
 std::map<int, std::vector<Triangle*>> g_AABB_Map;
 void CreateAABBStructure(const Vector3& position, float scale) {
 
-	unsigned int modelId;
+	unsigned int modelId = -1;
 	unsigned int unused1, unused2;
 	std::vector<glm::vec3> vertices;
 	std::vector<int> triangles;
@@ -50,19 +50,6 @@ void CreateAABBStructure(const Vector3& position, float scale) {
 	}
 }
 
-void Update()
-{
-	// Check each sphere on  your object
-	//Foreach collider
-	Sphere* a = new Sphere(Point(0), 1.0f);
-
-	Vector3 position = (10, 5, 8);
-
-	int position_hash = CalculateHash(position);
-	std::vector<Triangle*> aabb_triangles = g_AABB_Map[position_hash];
-
-}
-
 using namespace gdp;
 SimulationView g_View;
 
@@ -73,6 +60,7 @@ const int WINDOW_HEIGHT = 800;
 #define SUCCESS 0
 
 double g_LastCallOnUpdate;
+double g_LastCallOnPhysicsUpdate;
 double g_CurrentTime;
 
 const int MILLISECONDS_IN_A_SECOND = 1000;
@@ -81,55 +69,76 @@ const double FRAME_RATE = (double)1 / FRAMES_PER_SECOND;
 
 int WaitToUpdate = 0;
 
+float renderCount = 0;
+float renderTime = 0;
+int numFramesPerSecond = 0;
+
+float updateCount = 0;
+float updateTime = 0;
+int numUpdatesPerSecond = 0;
+
+float physics_update_count = 0;
+float physicsTime = 0;
+int numPhysicsUpdatesPerSecond = 0;
+
+float physics_update_timestep = 0.01f;
+
 void Update() {
 	Time::Update();
 	double deltaTimeInSeconds = Time::GetUnscaledDeltaTimeSeconds();
 	g_CurrentTime += deltaTimeInSeconds;
 
-	// Cap it at 60 FPS
-	// Example:
-	// 103
-	// 107
-	// 109
-	// 111
-	// 112
-	// 114
-	// 117 >= 116.6666
-	// g_LastCallOnUpdate = 117
-	// 120
-	// 123
-	// 127
-	// 130
-	// 132
-	// 135 133.66666
-	// g_LastCallOnUpdate = 135
-	// g_CurrentTime >= 100 + 16.66666
-	// OR Update every 10 update calls
-	// OR Update # objects / 10 to update all within 10 update calls.
+	std::stringstream ss;
 
-	if (g_CurrentTime >= g_LastCallOnUpdate + FRAME_RATE) {
-	//WaitToUpdate--;
-	//if (WaitToUpdate <= 0)
-	//{
-	//	WaitToUpdate = 10;
-		double elapsedUpdateTime = g_CurrentTime - g_LastCallOnUpdate;
-		//printf("Updating at %2.3f with %2.3f elapsed\n", g_CurrentTime, elapsedUpdateTime);
-		g_LastCallOnUpdate = g_CurrentTime;
+	renderTime += deltaTimeInSeconds;
+	updateTime += deltaTimeInSeconds;
+	physicsTime += deltaTimeInSeconds;
 
-		while (elapsedUpdateTime > 0.1) {
-			printf("ElapsedUpdateTimeIsTooBig!!!\n");
-			g_View.Update(elapsedUpdateTime);
-			elapsedUpdateTime -= 0.1;
-		}
-		g_View.Update(elapsedUpdateTime);
+	updateCount++;
+	if (updateTime > 0.1f) {
+		numUpdatesPerSecond = updateCount * 10;
+		updateCount = 0;
+		updateTime -= 0.1f;
 	}
-	else {
-		//printf(".");
+
+	if (physicsTime > 0.1f) {
+		numPhysicsUpdatesPerSecond = physics_update_count * 10;
+		physics_update_count = 0;
+		physicsTime -= 0.1f;
+	}
+
+	if (renderTime > 0.1f) {
+		numFramesPerSecond = renderCount * 10;
+		renderCount = 0;
+		renderTime -= 0.1f;
+	}
+
+	ss << WINDOW_TITLE << " FPS: " << numFramesPerSecond << " : Updates: " << numUpdatesPerSecond << " : Physics: " << numPhysicsUpdatesPerSecond;
+
+	glutSetWindowTitle(ss.str().c_str());
+
+	if (deltaTimeInSeconds > 0.1) {
+		printf("ElapsedUpdateTimeIsTooBig!!!\n");
+		deltaTimeInSeconds = 0.1;
+	}
+
+	printf("Update\n");
+	g_View.Update(deltaTimeInSeconds);
+
+	if (g_CurrentTime >= g_LastCallOnPhysicsUpdate + physics_update_timestep) {
+		physics_update_count++;
+
+		g_LastCallOnPhysicsUpdate = g_CurrentTime;
+		printf("PHYSICS\n");
+		g_View.PhysicsUpdate(physics_update_timestep);
 	}
 }
 
 void Render() {
+
+	printf("Render\n");
 	g_View.Render();
+	renderCount++;
 }
 
 int main(int argc, char** argv) {

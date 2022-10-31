@@ -94,6 +94,7 @@ void PhysicsDebugRenderer::Render()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+
 void PhysicsDebugRenderer::AddPhysicsObject(PhysicsObject* object)
 {
 	// TODO: Check if the object is already added to the vector.

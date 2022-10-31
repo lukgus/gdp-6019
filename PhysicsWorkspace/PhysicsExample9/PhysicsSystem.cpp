@@ -88,6 +88,11 @@ void PhysicsSystem::UpdateStep(float duration) {
 	}
 }
 
+void PhysicsSystem::AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle)
+{
+	m_AABBStructure[hash].push_back(triangle);
+}
+
 bool PhysicsSystem::CollisionTest(const Vector3& posA, iShape* shapeA, const Vector3& posB, iShape* shapeB)
 {
 	bool detectedCollision = false;

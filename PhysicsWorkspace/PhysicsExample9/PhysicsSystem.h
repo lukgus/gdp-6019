@@ -2,6 +2,7 @@
 
 #include "PhysicsObject.h"
 
+#include <map>
 #include <vector>
 #include "Spring.h"
 #include "Shapes.h"
@@ -14,6 +15,7 @@ public:
 	PhysicsObject* CreatePhysicsObject(const Vector3& position, iShape* shape);
 	void AddSpring(Spring* spring);
 	void UpdateStep(float duration);
+	void AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle);
 
 private:
 	bool CollisionTest(const Vector3& posA, iShape* shapeA, const Vector3& posB, iShape* shapeB);
@@ -27,4 +29,5 @@ private:
 
 	std::vector<PhysicsObject*> m_PhysicsObjects;
 	std::vector<Spring*> m_Springs;
+	std::map<int, std::vector<Triangle*>> m_AABBStructure;
 };
