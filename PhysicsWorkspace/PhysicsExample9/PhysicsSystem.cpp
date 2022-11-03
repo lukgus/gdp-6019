@@ -28,6 +28,9 @@ void PhysicsSystem::AddSpring(Spring* spring) {
 void PhysicsSystem::UpdateStep(float duration) {
 	size_t numPhysicsObjects = m_PhysicsObjects.size();
 
+	if (numPhysicsObjects == 0)
+		return;
+
 	for (int i = 0; i < numPhysicsObjects; i++) {
 		/* Gravity */
 		m_PhysicsObjects[i]->ApplyForce(Vector3(0, -9.81f, 0));

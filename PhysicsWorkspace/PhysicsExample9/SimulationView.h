@@ -32,7 +32,7 @@ public:
 	void Render();
 private:
 	void PrepareDemo();
-	void CreateBall(const Vector3& position, float scale);
+	Ball* CreateBall(const Vector3& position, float scale);
 	void CreateTree(const Vector3& position, float scale);
 	void LoadOurShip(const std::string& filepath);
 	//void AddGameDataToMap(GameObjectData& data);

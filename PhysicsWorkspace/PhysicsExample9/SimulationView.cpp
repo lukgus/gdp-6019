@@ -12,6 +12,10 @@ unsigned int g_SphereTextureId;
 
 const float SHIP_SCALE = 0.5f;
 
+Ball* g_Ball;
+
+std::map<int, GameObject*> g_PartialMeshObjects;
+std::map<int, GameObject*>::iterator g_PartialMeshObjectsCursor;
 
 SimulationView::SimulationView(){
 
@@ -61,11 +65,11 @@ void SimulationView::Initialize(int DemoId){
 	//ground->Scale = glm::vec3(20, 1, 20);
 
 	//m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
-	//PrepareDemo();
+	PrepareDemo();
 
-	//LoadOurShip("assets/models/BigShip.obj");
+	LoadOurShip("assets/models/BigShip.obj");
 
-	CreateBall(Vector3(0.0f, 50.0f, 0.0f), 2.0f);
+	g_Ball = CreateBall(Vector3(0.0f, 0.0f, 0.0f), 2.0f);
 
 	int breakhere = 0;
 }
@@ -140,8 +144,8 @@ void SimulationView::LoadOurShip(const std::string& filepath)
 	for (int i = 0; i < triangles.size(); i+= 3)
 	{
 		Point a = Point(vertices[i]) * SHIP_SCALE;
-		Point b = Point(vertices[i]) * SHIP_SCALE;
-		Point c = Point(vertices[i]) * SHIP_SCALE;
+		Point b = Point(vertices[i + 1]) * SHIP_SCALE;
+		Point c = Point(vertices[i + 2]) * SHIP_SCALE;
 
 		int hashA = CalculateHashValue(a);
 		int hashB = CalculateHashValue(b);
@@ -161,6 +165,49 @@ void SimulationView::LoadOurShip(const std::string& filepath)
 		if (hashC != hashB && hashC != hashA)
 			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashC, newTriangle);
 	}
+
+	// Create separate objects composed of all of the triangles within each AABB
+	// Hash tied to the id of the mesh we create
+	const std::map<int, std::vector<Triangle*>> aabb = m_PhysicsSystem.GetAABBStructure();
+	std::map<int, std::vector<Triangle*>>::const_iterator aabbIt = aabb.begin();
+
+	for (; aabbIt != aabb.end(); aabbIt++)
+	{
+		int hashValue = (*aabbIt).first;
+		std::vector<Triangle*> triangles = (*aabbIt).second;
+
+		std::vector<glm::vec3> vertices;
+		std::vector<int> faces;
+
+		for (int i = 0; i < triangles.size(); i++)
+		{
+			Triangle* triangle = triangles[i];
+			vertices.push_back(triangle->A.GetGLM());
+			vertices.push_back(triangle->B.GetGLM());
+			vertices.push_back(triangle->C.GetGLM());
+
+			faces.push_back(i * 3);
+			faces.push_back(i * 3 + 1);
+			faces.push_back(i * 3 + 2);
+		}
+
+		unsigned int modelId = -1;
+		GDP_CreateModel(modelId, vertices, faces);
+
+		gdp::GameObject* partialMeshGameObject = GDP_CreateGameObject();
+		partialMeshGameObject->Position = glm::vec3(0.0f);
+		partialMeshGameObject->Renderer.ShaderId = 1;
+		partialMeshGameObject->Renderer.MaterialId = g_SphereMaterialId;
+		partialMeshGameObject->Renderer.MeshId = modelId;
+		partialMeshGameObject->Scale = glm::vec3(1.0f);
+		partialMeshGameObject->Enabled = false;
+
+		g_PartialMeshObjects[hashValue] = partialMeshGameObject;
+	}
+
+	g_PartialMeshObjectsCursor = g_PartialMeshObjects.begin();
+
+	int check_aabb_gameobjects = 0;
 }
 
 void SimulationView::CreateTree(const Vector3& position, float scale) {
@@ -202,16 +249,16 @@ void SimulationView::CreateTree(const Vector3& position, float scale) {
 
 }
 
-void SimulationView::CreateBall(const Vector3& position, float scale) {
+Ball* SimulationView::CreateBall(const Vector3& position, float scale) {
 	Sphere* otherSphere = new Sphere(Point(0.0f, 0.0f, 0.0f), scale);
 
-	Ball newBall;
-	newBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(position, otherSphere);
-	newBall.gameObject = GDP_CreateGameObject();
-	newBall.gameObject->Renderer.ShaderId = 1;
-	newBall.gameObject->Renderer.MaterialId = g_SphereMaterialId;
-	newBall.gameObject->Renderer.MeshId = g_SphereModelId;
-	newBall.gameObject->Scale = glm::vec3(1, 1, 1) * scale;
+	Ball* newBall = new Ball();
+	//newBall.physicsObject = m_PhysicsSystem.CreatePhysicsObject(position, otherSphere);
+	newBall->gameObject = GDP_CreateGameObject();
+	newBall->gameObject->Renderer.ShaderId = 1;
+	newBall->gameObject->Renderer.MaterialId = g_SphereMaterialId;
+	newBall->gameObject->Renderer.MeshId = g_SphereModelId;
+	newBall->gameObject->Scale = glm::vec3(1, 1, 1) * scale;
 
 	// Create a bounding box around our ball.
 	//Vector3 halfExtents = m_BallBoundingBox.halfExtents;
@@ -220,7 +267,7 @@ void SimulationView::CreateBall(const Vector3& position, float scale) {
 
 	//m_PhysicsDebugRenderer->AddPhysicsObject(newBall.physicsObject);
 
-	m_Balls.push_back(newBall);
+	return newBall;
 }
 
 void SimulationView::PrepareDemo() {
@@ -334,20 +381,55 @@ void SimulationView::Update(double dt) {
 		m_BigShipGamObject->Scale = glm::vec3(1.0f) * SHIP_SCALE;
 	}
 
-	return;
+	if (GDP_IsKeyPressed('1')) {
+		m_BigShipGamObject->Enabled = !m_BigShipGamObject->Enabled;
+	}
 
+	if (GDP_IsKeyPressed('2')) {
+		(*g_PartialMeshObjectsCursor).second->Enabled = false;
+		g_PartialMeshObjectsCursor++;
+		if (g_PartialMeshObjectsCursor == g_PartialMeshObjects.end()) {
+			g_PartialMeshObjectsCursor = g_PartialMeshObjects.begin();
+		}
+		(*g_PartialMeshObjectsCursor).second->Enabled = true;
+	}
 
 	// Typically moved to a UserInput Section
-	if (m_ControlledBall.physicsObject != nullptr)
+	if (g_Ball)
 	{
 		if (GDP_IsKeyHeldDown('a'))
-			m_ControlledBall.physicsObject->ApplyForce(Vector3(1, 0, 0) * 15.0f);
+			g_Ball->gameObject->Position += glm::vec3(5.0f, 0.0f, 0.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('d'))
-			m_ControlledBall.physicsObject->ApplyForce(Vector3(-1, 0, 0) * 15.0f);
+			g_Ball->gameObject->Position += glm::vec3(-5.0f, 0.0f, 0.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('w'))
-			m_ControlledBall.physicsObject->ApplyForce(Vector3(0, 0, 1) * 15.0f);
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, 5.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('s'))
-			m_ControlledBall.physicsObject->ApplyForce(Vector3(0, 0, -1) * 15.0f);
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, -5.0f) * (float)dt;
+		if (GDP_IsKeyHeldDown('e'))
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 5.0f, 0.0f) * (float)dt;
+		if (GDP_IsKeyHeldDown('q'))
+			g_Ball->gameObject->Position += glm::vec3(0.0f, -5.0f, 0.0f) * (float)dt;
+
+		for (auto meshObjectIt = g_PartialMeshObjects.begin();
+			meshObjectIt != g_PartialMeshObjects.end();
+			meshObjectIt++)
+		{
+			meshObjectIt->second->Enabled = false;
+		}
+
+		int hashValue = CalculateHashValue(g_Ball->gameObject->Position);
+
+
+		// THIS will insert a pair if it does not exist
+		// Which is what we do not want.
+		// g_PartialMeshObjects[hashValue]->Enabled = true;
+
+		auto resultIt = g_PartialMeshObjects.find(hashValue);
+		if (resultIt != g_PartialMeshObjects.end())
+		{
+			if (resultIt->second != nullptr)
+				resultIt->second->Enabled = true;
+		}
 	}
 
 

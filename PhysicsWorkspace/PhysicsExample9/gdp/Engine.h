@@ -27,6 +27,8 @@ namespace gdp
             unsigned int& id, const char* filepath);
         GDPENGINE_API void GDP_LoadModel(
             unsigned int& id, const char* filepath);
+        GDPENGINE_API void GDP_CreateModel(
+            unsigned int& id, const std::vector<glm::vec3>& vertices, const std::vector<int>& triangles);
         GDPENGINE_API void GDP_GetModelData(unsigned int id,
             std::vector<glm::vec3>& vertices, std::vector<int>& triangles,
             unsigned int& numTriangles, unsigned int& vbo);

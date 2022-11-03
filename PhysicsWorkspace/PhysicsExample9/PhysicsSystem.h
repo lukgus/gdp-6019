@@ -17,6 +17,10 @@ public:
 	void UpdateStep(float duration);
 	void AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle);
 
+	const std::map<int, std::vector<Triangle*>>& GetAABBStructure() {
+		return m_AABBStructure;
+	}
+
 private:
 	bool CollisionTest(const Vector3& posA, iShape* shapeA, const Vector3& posB, iShape* shapeB);
 	bool CollisionTest(const Vector3& posA, Sphere* a, const Vector3& posB, Sphere* b);

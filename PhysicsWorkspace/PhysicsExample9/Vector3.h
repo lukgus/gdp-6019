@@ -34,6 +34,11 @@ public:
 	// returns nothing
 	Vector3(const Vector3& rhs);
 
+	glm::vec3 GetGLM()
+	{
+		return glm::vec3(x, y, z);
+	}
+
 	// Set
 	// Sets the vector values to the provided values
 	// returns nothing
