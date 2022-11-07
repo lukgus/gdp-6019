@@ -34,7 +34,7 @@ private:
 	void PrepareDemo();
 	Ball* CreateBall(const Vector3& position, float scale);
 	void CreateTree(const Vector3& position, float scale);
-	void LoadOurShip(const std::string& filepath);
+	void LoadStaticModelToOurAABBEnvironment(const std::string& filepath, const Vector3& position, float scale = 1.0f);
 	//void AddGameDataToMap(GameObjectData& data);
 	//GameObject* CreateObjectByType(const std::string& type);
 

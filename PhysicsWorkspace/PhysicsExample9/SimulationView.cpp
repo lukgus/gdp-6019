@@ -67,104 +67,11 @@ void SimulationView::Initialize(int DemoId){
 	//m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
 	PrepareDemo();
 
-	LoadOurShip("assets/models/BigShip.obj");
+	LoadStaticModelToOurAABBEnvironment("assets/models/terrain.obj", Vector3(-8, -32, 80), 0.2f);
 
-	g_Ball = CreateBall(Vector3(0.0f, 0.0f, 0.0f), 2.0f);
+	//LoadStaticModelToOurAABBEnvironment("assets/models/Fir_Tree.obj", Vector3(4, 4, 4), 1.f);
+	//LoadStaticModelToOurAABBEnvironment("assets/models/de--lorean.obj", Vector3(4, 4, 4), 1.f);
 
-	int breakhere = 0;
-}
-
-void SimulationView::Destroy() {
-
-}
-
-
-
-int CalculateHashValue(float x, float y, float z)
-{
-	int hashValue = 0;
-
-	hashValue += floor(x * SHIP_SCALE + 30) / 10 * 10000;
-	hashValue += floor(y * SHIP_SCALE + 10) / 10 * 100;
-	hashValue += floor(z * SHIP_SCALE + 60) / 10;
-	return hashValue;
-}
-
-int CalculateHashValue(const Vector3& v)
-{
-	return CalculateHashValue(v.x, v.y, v.z);
-}
-
-void SimulationView::LoadOurShip(const std::string& filepath)
-{
-	// GalacticaOriginal_ASCII_no_text.ply
-	unsigned int m_ShipModelId = -1;
-	GDP_LoadModel(m_ShipModelId, filepath.c_str());
-
-
-	std::vector<glm::vec3> vertices;
-	std::vector<int> triangles;
-
-	unsigned int unused1, unused2;
-	printf("Starting to load Large Model...\n");
-	GDP_GetModelData(m_ShipModelId, vertices, triangles, unused1, unused2);
-	printf("Done loading large model!\n");
-	Vector3 minPoints = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
-	Vector3 maxPoints = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
-	for (int i = 0; i < vertices.size(); i++) {
-		glm::vec3& vertex = vertices[i];
-
-		if (minPoints.x > vertex.x)
-			minPoints.x = vertex.x;
-		if (minPoints.y > vertex.y)
-			minPoints.y = vertex.y;
-		if (minPoints.z > vertex.z)
-			minPoints.z = vertex.z;
-
-		if (maxPoints.x < vertex.x)
-			maxPoints.x = vertex.x;
-		if (maxPoints.y < vertex.y)
-			maxPoints.y = vertex.y;
-		if (maxPoints.z < vertex.z)
-			maxPoints.z = vertex.z;
-	}
-
-	printf("MinPoints: (%.2f, %.2f, %.2f)\nMaxPoints: (%.2f, %.2f, %.2f)\n",
-		minPoints.x, minPoints.y, minPoints.z,
-		maxPoints.x, maxPoints.y, maxPoints.z);
-
-	m_BigShipGamObject = GDP_CreateGameObject();
-	m_BigShipGamObject->Position = glm::vec3(0, 0, 0);
-	m_BigShipGamObject->Renderer.ShaderId = 1;
-	m_BigShipGamObject->Renderer.MaterialId = g_SphereMaterialId;
-	m_BigShipGamObject->Renderer.MeshId = m_ShipModelId;
-	m_BigShipGamObject->Scale = glm::vec3(1.0f) * SHIP_SCALE;// *scale;
-
-
-	for (int i = 0; i < triangles.size(); i+= 3)
-	{
-		Point a = Point(vertices[i]) * SHIP_SCALE;
-		Point b = Point(vertices[i + 1]) * SHIP_SCALE;
-		Point c = Point(vertices[i + 2]) * SHIP_SCALE;
-
-		int hashA = CalculateHashValue(a);
-		int hashB = CalculateHashValue(b);
-		int hashC = CalculateHashValue(c);
-
-		//printf("(%.2f, %.2f, %.2f) -> %d\n", a.x, a.y, a.z, hashA);
-		//printf("(%.2f, %.2f, %.2f) -> %d\n", b.x, b.y, b.z, hashB);
-		//printf("(%.2f, %.2f, %.2f) -> %d\n", c.x, c.y, c.z, hashC);
-
-		Triangle* newTriangle = new Triangle(a, b, c);
-
-		m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashA, newTriangle);
-
-		if (hashA != hashB)
-			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashB, newTriangle);
-
-		if (hashC != hashB && hashC != hashA)
-			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashC, newTriangle);
-	}
 
 	// Create separate objects composed of all of the triangles within each AABB
 	// Hash tied to the id of the mesh we create
@@ -208,6 +115,107 @@ void SimulationView::LoadOurShip(const std::string& filepath)
 	g_PartialMeshObjectsCursor = g_PartialMeshObjects.begin();
 
 	int check_aabb_gameobjects = 0;
+
+	g_Ball = CreateBall(Vector3(0.0f, 0.0f, 0.0f), 2.0f);
+
+	int breakhere = 0;
+}
+
+void SimulationView::Destroy() {
+
+}
+
+
+
+int CalculateHashValue(float x, float y, float z)
+{
+	int hashValue = 0;
+
+	hashValue += floor(x + 128) / 10 * 1000000;
+	hashValue += floor(y + 128) / 10 * 1000;
+	hashValue += floor(z + 128) / 10;
+	return hashValue;
+}
+
+int CalculateHashValue(const Vector3& v)
+{
+	return CalculateHashValue(v.x, v.y, v.z);
+}
+
+void SimulationView::LoadStaticModelToOurAABBEnvironment(const std::string& filepath, const Vector3& position, float scale)
+{
+	// GalacticaOriginal_ASCII_no_text.ply
+	unsigned int m_ShipModelId = -1;
+	GDP_LoadModel(m_ShipModelId, filepath.c_str());
+
+	std::vector<glm::vec3> vertices;
+	std::vector<int> triangles;
+
+	unsigned int unused1, unused2;
+	printf("Starting to load Large Model...\n");
+	GDP_GetModelData(m_ShipModelId, vertices, triangles, unused1, unused2);
+	printf("Done loading large model!\n");
+	Vector3 minPoints = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	Vector3 maxPoints = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+	glm::vec3 pos = position.GetGLM();
+	for (int i = 0; i < vertices.size(); i++) {
+		glm::vec3& vertex = vertices[i];
+		vertex *= scale;
+		vertex += pos;
+
+		if (minPoints.x > vertex.x)
+			minPoints.x = vertex.x;
+		if (minPoints.y > vertex.y)
+			minPoints.y = vertex.y;
+		if (minPoints.z > vertex.z)
+			minPoints.z = vertex.z;
+
+		if (maxPoints.x < vertex.x)
+			maxPoints.x = vertex.x;
+		if (maxPoints.y < vertex.y)
+			maxPoints.y = vertex.y;
+		if (maxPoints.z < vertex.z)
+			maxPoints.z = vertex.z;
+	}
+
+	printf("MinPoints: (%.2f, %.2f, %.2f)\nMaxPoints: (%.2f, %.2f, %.2f)\n",
+		minPoints.x, minPoints.y, minPoints.z,
+		maxPoints.x, maxPoints.y, maxPoints.z);
+
+	m_BigShipGamObject = GDP_CreateGameObject();
+	m_BigShipGamObject->Position = pos;
+	m_BigShipGamObject->Renderer.ShaderId = 1;
+	m_BigShipGamObject->Renderer.MaterialId = g_SphereMaterialId;
+	m_BigShipGamObject->Renderer.MeshId = m_ShipModelId;
+	m_BigShipGamObject->Scale = glm::vec3(scale);
+	m_BigShipGamObject->Enabled = true;
+
+
+	for (int i = 0; i < triangles.size(); i+= 3)
+	{
+		Point a = Point(vertices[i]) * scale + pos;
+		Point b = Point(vertices[i + 1]) * scale + pos;
+		Point c = Point(vertices[i + 2]) * scale + pos;
+
+		int hashA = CalculateHashValue(a);
+		int hashB = CalculateHashValue(b);
+		int hashC = CalculateHashValue(c);
+
+		//printf("(%.2f, %.2f, %.2f) -> %d\n", a.x, a.y, a.z, hashA);
+		//printf("(%.2f, %.2f, %.2f) -> %d\n", b.x, b.y, b.z, hashB);
+		//printf("(%.2f, %.2f, %.2f) -> %d\n", c.x, c.y, c.z, hashC);
+
+		Triangle* newTriangle = new Triangle(a, b, c);
+
+		m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashA, newTriangle);
+
+		if (hashA != hashB)
+			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashB, newTriangle);
+
+		if (hashC != hashB && hashC != hashA)
+			m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashC, newTriangle);
+	}
+
 }
 
 void SimulationView::CreateTree(const Vector3& position, float scale) {
@@ -383,6 +391,14 @@ void SimulationView::Update(double dt) {
 
 	if (GDP_IsKeyPressed('1')) {
 		m_BigShipGamObject->Enabled = !m_BigShipGamObject->Enabled;
+	}
+
+
+	if (GDP_IsKeyHeldDown('4')) {
+		g_Ball->gameObject->Enabled = false;
+	}
+	if (GDP_IsKeyHeldDown('5')) {
+		g_Ball->gameObject->Enabled = true;
 	}
 
 	if (GDP_IsKeyPressed('2')) {

@@ -34,7 +34,7 @@ public:
 	// returns nothing
 	Vector3(const Vector3& rhs);
 
-	glm::vec3 GetGLM()
+	const glm::vec3 GetGLM() const
 	{
 		return glm::vec3(x, y, z);
 	}

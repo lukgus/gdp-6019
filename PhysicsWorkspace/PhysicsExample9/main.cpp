@@ -118,25 +118,25 @@ void Update() {
 	glutSetWindowTitle(ss.str().c_str());
 
 	if (deltaTimeInSeconds > 0.1) {
-		printf("ElapsedUpdateTimeIsTooBig!!!\n");
+		//printf("ElapsedUpdateTimeIsTooBig!!!\n");
 		deltaTimeInSeconds = 0.1;
 	}
 
-	printf("Update\n");
+	//printf("Update\n");
 	g_View.Update(deltaTimeInSeconds);
 
 	if (g_CurrentTime >= g_LastCallOnPhysicsUpdate + physics_update_timestep) {
 		physics_update_count++;
 
 		g_LastCallOnPhysicsUpdate = g_CurrentTime;
-		printf("PHYSICS\n");
+		//printf("PHYSICS\n");
 		g_View.PhysicsUpdate(physics_update_timestep);
 	}
 }
 
 void Render() {
 
-	printf("Render\n");
+	//printf("Render\n");
 	g_View.Render();
 	renderCount++;
 }
