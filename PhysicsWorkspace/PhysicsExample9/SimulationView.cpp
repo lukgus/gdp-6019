@@ -67,7 +67,7 @@ void SimulationView::Initialize(int DemoId){
 	//m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
 	PrepareDemo();
 
-	LoadStaticModelToOurAABBEnvironment("assets/models/terrain.obj", Vector3(-8, -32, 80), 0.2f);
+	LoadStaticModelToOurAABBEnvironment("assets/models/terrain.obj", Vector3(-40, -160, 400), 1.0f);
 
 	//LoadStaticModelToOurAABBEnvironment("assets/models/Fir_Tree.obj", Vector3(4, 4, 4), 1.f);
 	//LoadStaticModelToOurAABBEnvironment("assets/models/de--lorean.obj", Vector3(4, 4, 4), 1.f);
@@ -131,9 +131,9 @@ int CalculateHashValue(float x, float y, float z)
 {
 	int hashValue = 0;
 
-	hashValue += floor(x + 128) / 10 * 1000000;
-	hashValue += floor(y + 128) / 10 * 1000;
-	hashValue += floor(z + 128) / 10;
+	hashValue += floor(x + 128) / 100 * 10000;
+	hashValue += floor(y + 128) / 100 * 100;
+	hashValue += floor(z + 128) / 100;
 	return hashValue;
 }
 
@@ -182,6 +182,7 @@ void SimulationView::LoadStaticModelToOurAABBEnvironment(const std::string& file
 		minPoints.x, minPoints.y, minPoints.z,
 		maxPoints.x, maxPoints.y, maxPoints.z);
 
+	/** For rendering purposes only.. **/
 	m_BigShipGamObject = GDP_CreateGameObject();
 	m_BigShipGamObject->Position = pos;
 	m_BigShipGamObject->Renderer.ShaderId = 1;
@@ -189,17 +190,19 @@ void SimulationView::LoadStaticModelToOurAABBEnvironment(const std::string& file
 	m_BigShipGamObject->Renderer.MeshId = m_ShipModelId;
 	m_BigShipGamObject->Scale = glm::vec3(scale);
 	m_BigShipGamObject->Enabled = true;
-
+	/** End for rendering only **/
 
 	for (int i = 0; i < triangles.size(); i+= 3)
 	{
-		Point a = Point(vertices[i]) * scale + pos;
-		Point b = Point(vertices[i + 1]) * scale + pos;
-		Point c = Point(vertices[i + 2]) * scale + pos;
+		Point a = Point(vertices[i] * scale + pos);
+		Point b = Point(vertices[i + 1] * scale + pos);
+		Point c = Point(vertices[i + 2] * scale + pos);
 
 		int hashA = CalculateHashValue(a);
 		int hashB = CalculateHashValue(b);
 		int hashC = CalculateHashValue(c);
+
+		printf("%d , %d , %d\n", hashA, hashB, hashC);
 
 		//printf("(%.2f, %.2f, %.2f) -> %d\n", a.x, a.y, a.z, hashA);
 		//printf("(%.2f, %.2f, %.2f) -> %d\n", b.x, b.y, b.z, hashB);
@@ -382,12 +385,12 @@ void SimulationView::PrepareDemo() {
 }
 
 void SimulationView::Update(double dt) {
-	if (GDP_IsKeyHeldDown('a')) {
-		m_BigShipGamObject->Scale = glm::vec3(0.0f);
-	}
-	else if (GDP_IsKeyHeldDown('s')) {
-		m_BigShipGamObject->Scale = glm::vec3(1.0f) * SHIP_SCALE;
-	}
+	//if (GDP_IsKeyHeldDown('a')) {
+	//	m_BigShipGamObject->Scale = glm::vec3(0.0f);
+	//}
+	//else if (GDP_IsKeyHeldDown('s')) {
+	//	m_BigShipGamObject->Scale = glm::vec3(1.0f) * SHIP_SCALE;
+	//}
 
 	if (GDP_IsKeyPressed('1')) {
 		m_BigShipGamObject->Enabled = !m_BigShipGamObject->Enabled;
@@ -414,17 +417,17 @@ void SimulationView::Update(double dt) {
 	if (g_Ball)
 	{
 		if (GDP_IsKeyHeldDown('a'))
-			g_Ball->gameObject->Position += glm::vec3(5.0f, 0.0f, 0.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(25.0f, 0.0f, 0.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('d'))
-			g_Ball->gameObject->Position += glm::vec3(-5.0f, 0.0f, 0.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(-25.0f, 0.0f, 0.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('w'))
-			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, 5.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, 25.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('s'))
-			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, -5.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 0.0f, -25.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('e'))
-			g_Ball->gameObject->Position += glm::vec3(0.0f, 5.0f, 0.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(0.0f, 25.0f, 0.0f) * (float)dt;
 		if (GDP_IsKeyHeldDown('q'))
-			g_Ball->gameObject->Position += glm::vec3(0.0f, -5.0f, 0.0f) * (float)dt;
+			g_Ball->gameObject->Position += glm::vec3(0.0f, -25.0f, 0.0f) * (float)dt;
 
 		for (auto meshObjectIt = g_PartialMeshObjects.begin();
 			meshObjectIt != g_PartialMeshObjects.end();
@@ -434,6 +437,7 @@ void SimulationView::Update(double dt) {
 		}
 
 		int hashValue = CalculateHashValue(g_Ball->gameObject->Position);
+		printf("%d\n", hashValue);
 
 
 		// THIS will insert a pair if it does not exist
