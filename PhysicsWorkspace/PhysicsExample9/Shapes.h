@@ -65,3 +65,11 @@ public:
 	Point B;
 	Point C;
 };
+
+class Ray {
+public:
+	Ray(const Point& p, const Vector3& d)
+		: origin(p), direction(d) { }
+	Point origin;
+	Vector3 direction;
+};

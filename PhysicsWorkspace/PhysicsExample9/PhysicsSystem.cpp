@@ -42,7 +42,6 @@ void PhysicsSystem::UpdateStep(float duration) {
 
 	for (int i = 0; i < numPhysicsObjects; i++) {
 		m_PhysicsObjects[i]->Integrate(duration);
-
 	}
 
 	// Detect collisions
@@ -94,6 +93,23 @@ void PhysicsSystem::UpdateStep(float duration) {
 void PhysicsSystem::AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle)
 {
 	m_AABBStructure[hash].push_back(triangle);
+}
+
+bool PhysicsSystem::RayCast(Ray ray, PhysicsObject** hitObject)
+{
+	for (int i = 0; i < m_PhysicsObjects.size(); i++) {
+		PhysicsObject* physicsObject = m_PhysicsObjects[i];
+		if (physicsObject->pShape->GetType() == SHAPE_TYPE_SPHERE)
+		{
+			Sphere* pSphere = dynamic_cast<Sphere*>(physicsObject->pShape);
+			if (TestRaySphere(ray.origin, ray.direction, pSphere->Center + physicsObject->position, pSphere->Radius))
+			{
+				*hitObject = physicsObject;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 bool PhysicsSystem::CollisionTest(const Vector3& posA, iShape* shapeA, const Vector3& posB, iShape* shapeB)

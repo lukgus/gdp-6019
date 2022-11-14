@@ -17,6 +17,8 @@ public:
 	void UpdateStep(float duration);
 	void AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle);
 
+	bool RayCast(Ray ray, PhysicsObject** hitObject);
+
 	const std::map<int, std::vector<Triangle*>>& GetAABBStructure() {
 		return m_AABBStructure;
 	}

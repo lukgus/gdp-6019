@@ -1,5 +1,5 @@
 #include "PhysicsUtils.h"
-
+#include <glm/geometric.hpp>
 
 int TestSphereSphere(const Vector3&posA, float radiusA, const Vector3&posB, float radiusB)
 {
@@ -119,4 +119,26 @@ int TestSphereTriangle(const Point &center, float radius, Point a, Point b, Poin
 	// center to point p is less than the (squared) sphere radius
 	Vector3 v = p - center;
 	return Dot(v, v) <= radius * radius;
+}
+
+// Test if ray r = p + td intersects sphere s
+int TestRaySphere(const Point& p, const Vector3& d, const Point& center, float radius)
+{
+	Vector3 m = p - center;
+	float c = Dot(m, m) - radius * radius;
+
+	// If there is definitely at least one real root, there must be an intersection
+	if (c <= 0.0f) return 1;
+	float b = Dot(m, d);
+
+	// Early exit if ray origin outside sphere and ray pointing away from sphere
+	if (b > 0.0f) return 0;
+
+	float disc = b * b - c;
+
+	// A negative discriminant corresponds to ray missing sphere
+	if (disc < 0.0f) return 0;
+
+	// Now ray must hit sphere
+	return 1;
 }
