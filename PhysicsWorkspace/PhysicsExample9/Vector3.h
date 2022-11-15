@@ -59,6 +59,11 @@ public:
 	// Returns a copy to the new Vector3
 	Vector3 operator-(const Vector3& rhs) const;
 
+	// Minus Operator Overload
+	// Accepts a reference to the right hand side of the operation
+	// Returns a copy to the new Vector3
+	Vector3 operator-() const;
+
 	// Multiply Operator Overload
 	// Accepts a reference to the right hand side of the operation
 	// Returns a copy to the new Vector3

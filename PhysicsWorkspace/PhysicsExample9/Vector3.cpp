@@ -87,6 +87,13 @@ Vector3 Vector3::operator-(const Vector3& rhs) const {
 // Add Operator Overload
 // Accepts a reference to the right hand side of the add operation
 // Returns a copy to the new Vector3
+Vector3 Vector3::operator-() const {
+	return Vector3(-x, -y, -z);
+}
+
+// Add Operator Overload
+// Accepts a reference to the right hand side of the add operation
+// Returns a copy to the new Vector3
 Vector3 Vector3::operator*(const float& scalar) const {
 	return Vector3(x * scalar, y * scalar, z * scalar);
 }

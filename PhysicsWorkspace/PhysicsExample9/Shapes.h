@@ -69,7 +69,9 @@ public:
 class Ray {
 public:
 	Ray(const Point& p, const Vector3& d)
-		: origin(p), direction(d) { }
+		: origin(p), direction(d) {
+		direction.Normalize();
+	}
 	Point origin;
 	Vector3 direction;
 };

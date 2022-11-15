@@ -122,6 +122,7 @@ int TestSphereTriangle(const Point &center, float radius, Point a, Point b, Poin
 }
 
 // Test if ray r = p + td intersects sphere s
+// d must be a normalized vector!!!
 int TestRaySphere(const Point& p, const Vector3& d, const Point& center, float radius)
 {
 	Vector3 m = p - center;

@@ -60,20 +60,31 @@ void SimulationView::Initialize(int DemoId){
 	physicsGround->SetMass(-1.f);
 	physicsGround->pBoundingBox = groundBoundingBox;
 
-	// Create a ground plane
+	// Create a sphere
+	GDP_LoadModel(g_SphereModelId, "assets/models/sphere.obj");
+	GDP_LoadModel(g_FirTreeModelId, "assets/models/Fir_Tree.fbx");
+
+	// Load Textures
+	GDP_LoadTexture(g_SphereTextureId, "assets/textures/white.png");
+
+	// Create Material
+	GDP_CreateMaterial(g_SphereMaterialId, g_SphereTextureId, color(1, 0, 0));
+	GDP_CreateMaterial(g_TreeMaterialId, g_SphereTextureId, color(0, 1, 0));
+
+	//Create a ground plane
 	GameObject* ground = GDP_CreateGameObject();
 	ground->Renderer.ShaderId = 1;
 	ground->Renderer.MaterialId = groundMaterialId;
 	ground->Renderer.MeshId = planeModelId;
 	ground->Scale = glm::vec3(20, 1, 20);
 
-	//m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
-	PrepareDemo();
+	m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
+	//PrepareDemo();
 
-	m_Balls.push_back(*CreateBall(Vector3(-5, 1, -5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3( 5, 1, -5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3(-5, 1,  5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3( 5, 1,  5), 1.0f));
+	m_Balls.push_back(*CreateBall(Vector3(-5, 3, -5), 1.0f));
+	m_Balls.push_back(*CreateBall(Vector3( 5, 4, -5), 1.0f));
+	m_Balls.push_back(*CreateBall(Vector3(-5, 5,  5), 1.0f));
+	m_Balls.push_back(*CreateBall(Vector3( 5, 6,  5), 1.0f));
 
 	//LoadStaticModelToOurAABBEnvironment("assets/models/terrain.obj", Vector3(-40, -160, 400), 1.0f);
 
@@ -276,6 +287,7 @@ Ball* SimulationView::CreateBall(const Vector3& position, float scale) {
 	Ball* newBall = new Ball();
 	newBall->physicsObject = m_PhysicsSystem.CreatePhysicsObject(position, otherSphere);
 	newBall->gameObject = GDP_CreateGameObject();
+	newBall->gameObject->Position = position.GetGLM();
 	newBall->gameObject->Renderer.ShaderId = 1;
 	newBall->gameObject->Renderer.MaterialId = g_SphereMaterialId;
 	newBall->gameObject->Renderer.MeshId = g_SphereModelId;
@@ -292,17 +304,6 @@ Ball* SimulationView::CreateBall(const Vector3& position, float scale) {
 }
 
 void SimulationView::PrepareDemo() {
-
-	// Create a sphere
-	GDP_LoadModel(g_SphereModelId, "assets/models/sphere.obj");
-	GDP_LoadModel(g_FirTreeModelId, "assets/models/Fir_Tree.fbx");
-
-	// Load Textures
-	GDP_LoadTexture(g_SphereTextureId, "assets/textures/white.png");
-
-	// Create Material
-	GDP_CreateMaterial(g_SphereMaterialId, g_SphereTextureId, color(1, 0, 0));
-	GDP_CreateMaterial(g_TreeMaterialId, g_SphereTextureId, color(0, 1, 0));
 
 	//std::vector<glm::vec3> vertices;
 	//std::vector<int> triangles;
@@ -385,41 +386,61 @@ void SimulationView::PrepareDemo() {
 	//}	
 }
 
+bool isClicked = false;
 void SimulationView::Update(double dt) {
 	int state = 0;
 	if (GDP_GetMouseButtonState(0, state)) {
-		printf("Mouse Pressed!\n");
+		// printf("Mouse Pressed!\n");
 	}
 
 	if (GDP_IsKeyHeldDown('x')) {
-		int mouseX = 0, mouseY = 0;
-		GDP_GetMousePosition(mouseX, mouseY);
+		if (!isClicked) {
+			isClicked = true;
 
-		// viewport info:
-		int width = 1200;
-		int height = 800;
+			// viewport info:
+			int width = 1200;
+			int height = 800;
+			int mouseX = 0, mouseY = 0;
+			GDP_GetMousePosition(mouseX, mouseY);
+			Point cameraPosition = glm::vec3(0.0f, 32.0f, -48.0f);
+			Point viewLookAt = cameraPosition;
+			viewLookAt.Normalize();
 
-		
-		glm::mat4 projection = glm::frustum(-1.f , 1.f, -1.f, 1.f, 1.f, 10.0f);
-		glm::vec4 viewport = glm::vec4(0, 0, width, height);
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 1.f));
+			glm::vec3 mousePosition(mouseX, height - mouseY, 1.f);
+			glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f), -viewLookAt.GetGLM(), glm::vec3(0, 1, 0));
+			glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
+			glm::mat4 modelViewMatrix = modelMatrix * viewMatrix;
+			glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 1.0f);
+			glm::vec4 viewport = glm::vec4(0, 0, width, height);
 
-		glm::vec3 mousePoint = glm::vec3(mouseX, mouseY, 1.0f);
-		glm::vec3 point = glm::unProject(mousePoint, model, projection, viewport);
+			glm::vec3 point = glm::unProject(mousePosition, modelViewMatrix, projectionMatrix, viewport);
 
-		printf("MousePosition: (%d, %d)\n", mouseX, mouseY);
-		printf("viewport: %d %d %d %d\n", 0, 0, width, height);
-		printf("Point: (%.2f, %.2f, %.2f)\n", point.x, point.y, point.z);
+			printf("\n");
+			printf("MousePosition: (%d, %d)\n", mouseX, mouseY);
+			printf("viewport: %d %d %d %d\n", 0, 0, width, height);
+			printf("Point: (%.2f, %.2f, %.2f)\n", point.x, point.y, point.z);
 
-		Point origin = glm::vec3(0.0f, 32.0f, -48.0f);
-		Vector3 direction = point - origin.GetGLM();
-		Ray ray(origin, direction);
+			//Vector3 direction = point - origin.GetGLM();
+			//direction.Normalize();
 
-		printf("Normalized: (%.2f, %.2f, %.2f)\n", direction.x, direction.y, direction.z);
-		PhysicsObject * hitObject;
-		if (m_PhysicsSystem.RayCast(ray, &hitObject)) {
-			hitObject->ApplyForce(Vector3(0.0f, 4000.0f, 0.0f));
+			//point.x = -point.x;
+			//point.y = -(point.y + 0.5f);
+			//point = glm::normalize(point);
+			Ray ray(cameraPosition, point);
+			Vector3 debugPoint = cameraPosition + point;
+			printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
+
+			CreateBall(debugPoint, .01f);
+
+			printf("Normalized: (%.2f, %.2f, %.2f)\n", point.x, point.y, point.z);
+			PhysicsObject * hitObject;
+			if (m_PhysicsSystem.RayCast(ray, &hitObject)) {
+				hitObject->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
+			}
 		}
+	}
+	else {
+		isClicked = false;
 	}
 
 	//if (GDP_IsKeyHeldDown('a')) {
