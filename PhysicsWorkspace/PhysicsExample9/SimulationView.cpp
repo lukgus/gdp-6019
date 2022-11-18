@@ -81,10 +81,12 @@ void SimulationView::Initialize(int DemoId){
 	m_PhysicsDebugRenderer->AddPhysicsObject(physicsGround);
 	//PrepareDemo();
 
-	m_Balls.push_back(*CreateBall(Vector3(-5, 3, -5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3( 5, 4, -5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3(-5, 5,  5), 1.0f));
-	m_Balls.push_back(*CreateBall(Vector3( 5, 6,  5), 1.0f));
+	for (int i = 10; i >= -10; i-=2) {
+		Ball* b = CreateBall(Vector3(0, 3, i), 0.98f);
+		m_Balls.push_back(*b);
+		if (i < 0) b->physicsObject->type = 1 << 6;
+		else b->physicsObject->type = 1 << 3;
+	}
 
 	//LoadStaticModelToOurAABBEnvironment("assets/models/terrain.obj", Vector3(-40, -160, 400), 1.0f);
 
@@ -393,50 +395,117 @@ void SimulationView::Update(double dt) {
 		// printf("Mouse Pressed!\n");
 	}
 
-	if (GDP_IsKeyHeldDown('x')) {
+	bool ClosestObject = GDP_IsKeyHeldDown('x');
+	bool FirstObject = GDP_IsKeyHeldDown('z');
+
+
+	if (ClosestObject || FirstObject) {
 		if (!isClicked) {
 			isClicked = true;
 
-			// viewport info:
+			// 1. Mouse Position
+			// - X & Y Position with top Left origin (0,0)
+			//   down is +iveY
+			// 
+			// 2. Viewport: Window Information 
+			// - Width & Height of your window OpenGL Context
+			// 
+			// 3. Projection Matrix built from your perspective
+			// - Field of View has to equal the value used for Rendering
+			// - Aspect Ratio built from the width & height
+			// - zNearPlane distance
+			// - zFarPlane distance
+			// 
+			// 4. View Matrix is built from the camera transform
+			// - Camera Position
+			// - Camera Orientation (includes Up direction)
+
+
 			int width = 1200;
 			int height = 800;
 			int mouseX = 0, mouseY = 0;
 			GDP_GetMousePosition(mouseX, mouseY);
+
+
+			// 1. Cursor Position on the Screen
+			glm::vec3 cursorPositionOnScreenSpace (
+				mouseX,				// X is fine from left to right
+				height - mouseY,	// Since Y is origin at the top, and positive as it goes down the screen
+									// we need to fix it like this.
+				1.f
+			);
+
+
+			// 2. Viewport: Window Information
+			glm::vec4 viewport = glm::vec4(0, 0, width, height);
+
+
+			// 3 Projection Matrix
+			glm::mat4 projectionMatrix = glm::perspective(
+				glm::radians(45.0f),			// Field of View
+				(float)width / (float)height,	// Aspect Ratio
+				0.1f,							// zNear plane
+				1.0f							// zFar plane
+			);
+
+
+			// 4. View Matrix info:
 			Point cameraPosition = glm::vec3(0.0f, 32.0f, -48.0f);
 			Point viewLookAt = cameraPosition;
 			viewLookAt.Normalize();
+			glm::mat4 viewMatrix = glm::lookAt(
+				glm::vec3(0.0f),				// Position of the Camera
+				-viewLookAt.GetGLM(),			// Target view point
+				glm::vec3(0, 1, 0)				// Up direction
+			);
 
-			glm::vec3 mousePosition(mouseX, height - mouseY, 1.f);
-			glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f), -viewLookAt.GetGLM(), glm::vec3(0, 1, 0));
-			glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
-			glm::mat4 modelViewMatrix = modelMatrix * viewMatrix;
-			glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 1.0f);
-			glm::vec4 viewport = glm::vec4(0, 0, width, height);
 
-			glm::vec3 point = glm::unProject(mousePosition, modelViewMatrix, projectionMatrix, viewport);
 
-			printf("\n");
-			printf("MousePosition: (%d, %d)\n", mouseX, mouseY);
-			printf("viewport: %d %d %d %d\n", 0, 0, width, height);
-			printf("Point: (%.2f, %.2f, %.2f)\n", point.x, point.y, point.z);
+			// Calculate our position in world space
+			glm::vec3 pointInWorldSpace = glm::unProject(cursorPositionOnScreenSpace, viewMatrix, projectionMatrix, viewport);
 
-			//Vector3 direction = point - origin.GetGLM();
-			//direction.Normalize();
 
-			//point.x = -point.x;
-			//point.y = -(point.y + 0.5f);
-			//point = glm::normalize(point);
-			Ray ray(cameraPosition, point);
-			Vector3 debugPoint = cameraPosition + point;
-			printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
+			// Using the point in World space and the Camera Position
+			// We can calculate a direction to use for a Ray
+			Ray ray(cameraPosition, pointInWorldSpace);
 
-			CreateBall(debugPoint, .01f);
 
-			printf("Normalized: (%.2f, %.2f, %.2f)\n", point.x, point.y, point.z);
-			PhysicsObject * hitObject;
-			if (m_PhysicsSystem.RayCast(ray, &hitObject)) {
+
+
+			PhysicsObject* hitObject;
+
+			if (FirstObject && m_PhysicsSystem.RayCastFirstFound(ray, &hitObject)) {
 				hitObject->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
 			}
+
+			if (ClosestObject && m_PhysicsSystem.RayCastClosest(ray, &hitObject)) {
+				hitObject->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
+			}
+
+			// MASK EXAMPLE
+			//unsigned char flags = 0;
+			//if (ClosestObject)
+			//	flags |= 1 << 6;
+			//else if (FirstObject)
+			//	flags |= 1 << 3;
+			//if (m_PhysicsSystem.RayCastClosest(ray, &hitObject, flags)) {
+			//	hitObject->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
+			//}
+
+
+			//std::vector<PhysicsObject*> hitList = m_PhysicsSystem.RayCastAll(ray);
+			//for (int i = 0; i < hitList.size(); i++) {
+			//	hitList[i]->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
+			//}
+
+
+			Vector3 debugPoint = cameraPosition + cursorPositionOnScreenSpace;
+			CreateBall(debugPoint, .01f);
+			printf("\n");
+			printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
+			printf("MousePosition: (%d, %d)\n", mouseX, mouseY);
+			printf("viewport: %d %d %d %d\n", 0, 0, width, height);
+			printf("Point: (%.2f, %.2f, %.2f)\n", cursorPositionOnScreenSpace.x, cursorPositionOnScreenSpace.y, cursorPositionOnScreenSpace.z);
 		}
 	}
 	else {

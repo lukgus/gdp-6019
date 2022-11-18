@@ -104,7 +104,13 @@ public:
 	void Normalize();
 
 	// Magnitude will return the length of the vector
-	float Magnitude();
+	float Magnitude() const;
+
+	// Distance will return the distance between two vectors
+	static float Distance(const Vector3& a, const Vector3& b);
+
+	// Distance will return the distance between two vectors
+	static float Length(const Vector3& v);
 
 	// Inverse will invert the direction of the vector
 	Vector3 Inverse();

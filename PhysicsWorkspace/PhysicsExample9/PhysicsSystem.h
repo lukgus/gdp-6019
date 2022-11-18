@@ -17,7 +17,12 @@ public:
 	void UpdateStep(float duration);
 	void AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle);
 
-	bool RayCast(Ray ray, PhysicsObject** hitObject);
+// 0b is binary notation for the numbers that follow
+// 0b00000010 = 2
+// 0b00000110 = 6
+	bool RayCastClosest(Ray ray, PhysicsObject** hitObject, unsigned char type = 0b11111111);
+	bool RayCastFirstFound(Ray ray, PhysicsObject** hitObject);
+	std::vector<PhysicsObject*> RayCastAll(Ray ray);
 
 	const std::map<int, std::vector<Triangle*>>& GetAABBStructure() {
 		return m_AABBStructure;

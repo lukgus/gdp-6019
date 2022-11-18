@@ -159,7 +159,7 @@ void Vector3::Normalize() {
 }
 
 // Magnitude will return the length of the vector
-float Vector3::Magnitude() {
+float Vector3::Magnitude() const{
 	return sqrt(x * x + y * y + z * z);
 }
 // Inverse will invert the direction of the vector
@@ -171,6 +171,18 @@ Vector3 Vector3::Inverse() {
 	//return *this * -1.f;
 
 	return Vector3(x, y, z) * -1.f;
+}
+
+// Distance will return the distance between two vectors
+float Vector3::Length(const Vector3& v)
+{
+	return v.Magnitude();
+}
+
+// Distance will return the distance between two vectors
+float Vector3::Distance(const Vector3& a, const Vector3& b)
+{
+	return (a - b).Magnitude();
 }
 
 // Multiply Operator Overload

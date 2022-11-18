@@ -28,6 +28,9 @@ void PhysicsSystem::AddSpring(Spring* spring) {
 void PhysicsSystem::UpdateStep(float duration) {
 	size_t numPhysicsObjects = m_PhysicsObjects.size();
 
+	// Get Camera Position
+	// Perform 1 iteration of bubble sort
+
 	if (numPhysicsObjects == 0)
 		return;
 
@@ -95,7 +98,40 @@ void PhysicsSystem::AddTriangleToAABBCollisionCheck(int hash, Triangle* triangle
 	m_AABBStructure[hash].push_back(triangle);
 }
 
-bool PhysicsSystem::RayCast(Ray ray, PhysicsObject** hitObject)
+bool PhysicsSystem::RayCastClosest(Ray ray, PhysicsObject** hitObject, unsigned char flags)
+{
+	PhysicsObject* closestPhysicsObject = nullptr;
+	float closestDistance = FLT_MAX;
+
+	// An alternate method to optimize this would be to sort the m_PhysicsObjects
+	// by the distance of the object from the eye.
+	// Sort objects should be done once per frame, not each call
+	// This can be a "bubble sort", as objects will not be needing to be 100%
+	// sorted every frame, and you are not jumping around the world really fast.
+
+	for (int i = 0; i < m_PhysicsObjects.size(); i++) {
+		PhysicsObject* physicsObject = m_PhysicsObjects[i];
+		if (physicsObject->pShape->GetType() == SHAPE_TYPE_SPHERE)
+		{
+			Sphere* pSphere = dynamic_cast<Sphere*>(physicsObject->pShape);
+			if (physicsObject->type & flags)
+			{
+				if (TestRaySphere(ray.origin, ray.direction, pSphere->Center + physicsObject->position, pSphere->Radius))
+				{
+					float distance = Vector3::Distance(ray.origin, physicsObject->position);
+					if (distance < closestDistance) {
+						closestPhysicsObject = physicsObject;
+						closestDistance = distance;
+					}
+				}
+			}
+		}
+	}
+	*hitObject = closestPhysicsObject;
+	return closestPhysicsObject != nullptr;
+}
+
+bool PhysicsSystem::RayCastFirstFound(Ray ray, PhysicsObject** hitObject)
 {
 	for (int i = 0; i < m_PhysicsObjects.size(); i++) {
 		PhysicsObject* physicsObject = m_PhysicsObjects[i];
@@ -110,6 +146,23 @@ bool PhysicsSystem::RayCast(Ray ray, PhysicsObject** hitObject)
 		}
 	}
 	return false;
+}
+
+std::vector<PhysicsObject*> PhysicsSystem::RayCastAll(Ray ray)
+{
+	std::vector<PhysicsObject*> hitList;
+	for (int i = 0; i < m_PhysicsObjects.size(); i++) {
+		PhysicsObject* physicsObject = m_PhysicsObjects[i];
+		if (physicsObject->pShape->GetType() == SHAPE_TYPE_SPHERE)
+		{
+			Sphere* pSphere = dynamic_cast<Sphere*>(physicsObject->pShape);
+			if (TestRaySphere(ray.origin, ray.direction, pSphere->Center + physicsObject->position, pSphere->Radius))
+			{
+				hitList.push_back(physicsObject);
+			}
+		}
+	}
+	return hitList;
 }
 
 bool PhysicsSystem::CollisionTest(const Vector3& posA, iShape* shapeA, const Vector3& posB, iShape* shapeB)

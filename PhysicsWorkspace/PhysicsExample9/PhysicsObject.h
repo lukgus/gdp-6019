@@ -35,6 +35,7 @@ public:
 
 	BoundingBox* pBoundingBox;
 	iShape* pShape;
+	unsigned char type;
 
 private:
 	friend class PhysicsSystem;

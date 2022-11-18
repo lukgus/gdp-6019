@@ -141,8 +141,8 @@ void Render() {
 	renderCount++;
 }
 
-int main(int argc, char** argv) {
-
+void RunSimulation()
+{
 	GDP_Initialize();
 	GDP_CreateWindow(WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT);
 	GDP_UpdateCallback(&Update);
@@ -156,5 +156,9 @@ int main(int argc, char** argv) {
 	g_View.Destroy();
 	GDP_Destroy();
 
+}
+
+int main(int argc, char** argv) {
+	RunSimulation();
 	return SUCCESS;
 }
