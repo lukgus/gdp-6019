@@ -414,6 +414,7 @@ void SimulationView::Update(double dt) {
 	else if (GDP_IsKeyHeldDown('2')) {
 		MouseStaticPosX = m_CurrMouseX;
 		MouseStaticPosY = m_CurrMouseY;
+		glutSetCursor(GLUT_CURSOR_NONE);
 		m_FreeMotionMouse = false;
 	}
 
@@ -446,13 +447,15 @@ void SimulationView::Update(double dt) {
 		// NOTE: SetCursorPos is setting the mouse position according to the 
 		//		 mouse position in the Window/Monitor 
 		//       While we are calculating the delta positions based on the window
-		SetCursorPos(MouseStaticPosX, MouseStaticPosY + 23);
+		// NOTE: 23 was discovered to be the size of the bar at the top of the window.
+
+		glutWarpPointer(MouseStaticPosX, MouseStaticPosY);
 
 		deltaMouseX = m_CurrMouseX - MouseStaticPosX;
 		deltaMouseY = m_CurrMouseY - MouseStaticPosY;
 	}
 
-	//printf("%d %d -> %d %d\n", m_CurrMouseX, m_CurrMouseY, deltaMouseX, deltaMouseY);
+	printf("%d %d -> %d %d\n", m_CurrMouseX, m_CurrMouseY, deltaMouseX, deltaMouseY);
 
 	const float rotateSpeed = 0.01f;
 	m_HorizontalAngle -= deltaMouseX * rotateSpeed;
