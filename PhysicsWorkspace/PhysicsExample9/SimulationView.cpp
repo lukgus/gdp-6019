@@ -29,6 +29,11 @@ SimulationView::~SimulationView(){
 }
 
 void SimulationView::Initialize(int DemoId){
+	m_CameraPosition.Set(0.f, 1.0f, 0.0f);
+	m_CameraDirection.Set(0.f, 0.f, 1.f);
+
+	m_FreeMotionMouse = true;
+
 	// Load Models
 	unsigned int planeModelId = -1;
 	GDP_LoadModel(planeModelId, "assets/models/plane.obj");
@@ -233,6 +238,8 @@ void SimulationView::LoadStaticModelToOurAABBEnvironment(const std::string& file
 
 		Triangle* newTriangle = new Triangle(a, b, c);
 
+		//m_PhysicsSystem.AddTriangleToOctTree(newTriangle);
+
 		m_PhysicsSystem.AddTriangleToAABBCollisionCheck(hashA, newTriangle);
 
 		if (hashA != hashB)
@@ -389,11 +396,102 @@ void SimulationView::PrepareDemo() {
 }
 
 bool isClicked = false;
+int MouseStaticPosX = 400;
+int MouseStaticPosY = 400;
+
+
+
 void SimulationView::Update(double dt) {
-	int state = 0;
-	if (GDP_GetMouseButtonState(0, state)) {
-		// printf("Mouse Pressed!\n");
+	m_PrevMouseX = m_CurrMouseX;
+	m_PrevMouseY = m_CurrMouseY;
+	GDP_GetMousePosition(m_CurrMouseX, m_CurrMouseY);
+	int deltaMouseX = 0;
+	int deltaMouseY = 0;
+
+	if (GDP_IsKeyHeldDown('1')) {
+		m_FreeMotionMouse = true;
 	}
+	else if (GDP_IsKeyHeldDown('2')) {
+		MouseStaticPosX = m_CurrMouseX;
+		MouseStaticPosY = m_CurrMouseY;
+		m_FreeMotionMouse = false;
+	}
+
+	if (m_FreeMotionMouse)
+	{
+		deltaMouseX = m_CurrMouseX - m_PrevMouseX;
+		deltaMouseY = m_CurrMouseY - m_PrevMouseY;
+
+		int state = 0;
+		if (!m_IsMouseDown && GDP_GetMouseButtonState(0, state)) {
+			m_IsMouseDown = true;
+			m_MouseDownX = m_CurrMouseX;
+			m_MouseDownY = m_CurrMouseY;
+
+			// Fixes jumping across the screen from the previous position
+			// being where the user last pressed the mouse
+			m_PrevMouseX = m_MouseDownX;
+			m_PrevMouseY = m_MouseDownY;
+
+			deltaMouseX = m_CurrMouseX - m_PrevMouseX;
+			deltaMouseY = m_CurrMouseY - m_PrevMouseY;
+		}
+		if (m_IsMouseDown && !GDP_GetMouseButtonState(0, state)) {
+			m_IsMouseDown = false;
+		}
+	}
+	else
+	{
+		// NOTE: SetCursorPos triggers a mouse motion!
+		// NOTE: SetCursorPos is setting the mouse position according to the 
+		//		 mouse position in the Window/Monitor 
+		//       While we are calculating the delta positions based on the window
+		SetCursorPos(MouseStaticPosX, MouseStaticPosY + 23);
+
+		deltaMouseX = m_CurrMouseX - MouseStaticPosX;
+		deltaMouseY = m_CurrMouseY - MouseStaticPosY;
+	}
+
+	//printf("%d %d -> %d %d\n", m_CurrMouseX, m_CurrMouseY, deltaMouseX, deltaMouseY);
+
+	const float rotateSpeed = 0.01f;
+	m_HorizontalAngle -= deltaMouseX * rotateSpeed;
+
+	// PI defined as 3.14 ...
+	// PI/2 = 90degrees
+	// PI = 180 degrees
+	// PI3/2 = 270 degrees
+	// PI*2 = 360 degrees	~6.28...
+
+
+	const float moveSpeed = 5.0f;
+
+
+	m_CameraDirection.x = sin(m_HorizontalAngle);
+	m_CameraDirection.z = cos(m_HorizontalAngle);
+	m_CameraDirection.y -= deltaMouseY * rotateSpeed;
+
+	Vector3 forwardVector(m_CameraDirection.x, 0.0f, m_CameraDirection.z);
+	Vector3 rightVector(
+		glm::cross(forwardVector.GetGLM(), glm::vec3(0, 1, 0))
+	);
+
+	if (GDP_IsKeyHeldDown('w')) {
+		m_CameraPosition += forwardVector * moveSpeed * dt;
+	}
+	if (GDP_IsKeyHeldDown('a')) {
+		m_CameraPosition -= rightVector * moveSpeed * dt;
+	}
+	if (GDP_IsKeyHeldDown('s')) {
+		m_CameraPosition -= forwardVector * moveSpeed * dt;
+	}
+	if (GDP_IsKeyHeldDown('d')) {
+		m_CameraPosition += rightVector * moveSpeed * dt;
+	}
+
+
+	SetCameraPosition(m_CameraPosition.GetGLM());
+	SetCameraFacingDirection(m_CameraDirection.GetGLM());
 
 	bool ClosestObject = GDP_IsKeyHeldDown('x');
 	bool FirstObject = GDP_IsKeyHeldDown('z');
@@ -423,14 +521,12 @@ void SimulationView::Update(double dt) {
 
 			int width = 1200;
 			int height = 800;
-			int mouseX = 0, mouseY = 0;
-			GDP_GetMousePosition(mouseX, mouseY);
 
 
 			// 1. Cursor Position on the Screen
 			glm::vec3 cursorPositionOnScreenSpace (
-				mouseX,				// X is fine from left to right
-				height - mouseY,	// Since Y is origin at the top, and positive as it goes down the screen
+				m_CurrMouseX,				// X is fine from left to right
+				height - m_CurrMouseY,	// Since Y is origin at the top, and positive as it goes down the screen
 									// we need to fix it like this.
 				1.f
 			);
@@ -448,17 +544,17 @@ void SimulationView::Update(double dt) {
 				1.0f							// zFar plane
 			);
 
-
-			// 4. View Matrix info:
-			Point cameraPosition = glm::vec3(0.0f, 32.0f, -48.0f);
-			Point viewLookAt = cameraPosition;
-			viewLookAt.Normalize();
 			glm::mat4 viewMatrix = glm::lookAt(
-				glm::vec3(0.0f),				// Position of the Camera
-				-viewLookAt.GetGLM(),			// Target view point
+				m_CameraPosition.GetGLM(),				// Position of the Camera
+				m_CameraPosition.GetGLM() + m_CameraDirection.GetGLM(),			// Target view point
 				glm::vec3(0, 1, 0)				// Up direction
 			);
 
+
+			if (!m_FreeMotionMouse) {
+				cursorPositionOnScreenSpace.x = width / 2;
+				cursorPositionOnScreenSpace.y = height / 2;
+			}
 
 
 			// Calculate our position in world space
@@ -467,9 +563,7 @@ void SimulationView::Update(double dt) {
 
 			// Using the point in World space and the Camera Position
 			// We can calculate a direction to use for a Ray
-			Ray ray(cameraPosition, pointInWorldSpace);
-
-
+			Ray ray(m_CameraPosition, pointInWorldSpace);
 
 
 			PhysicsObject* hitObject;
@@ -499,13 +593,13 @@ void SimulationView::Update(double dt) {
 			//}
 
 
-			Vector3 debugPoint = cameraPosition + cursorPositionOnScreenSpace;
+			Vector3 debugPoint = m_CameraPosition + cursorPositionOnScreenSpace;
 			CreateBall(debugPoint, .01f);
-			printf("\n");
-			printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
-			printf("MousePosition: (%d, %d)\n", mouseX, mouseY);
-			printf("viewport: %d %d %d %d\n", 0, 0, width, height);
-			printf("Point: (%.2f, %.2f, %.2f)\n", cursorPositionOnScreenSpace.x, cursorPositionOnScreenSpace.y, cursorPositionOnScreenSpace.z);
+			//printf("\n");
+			//printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
+			//printf("MousePosition: (%d, %d)\n", m_CurrMouseX, m_CurrMouseY);
+			//printf("viewport: %d %d %d %d\n", 0, 0, width, height);
+			//printf("Point: (%.2f, %.2f, %.2f)\n", cursorPositionOnScreenSpace.x, cursorPositionOnScreenSpace.y, cursorPositionOnScreenSpace.z);
 		}
 	}
 	else {

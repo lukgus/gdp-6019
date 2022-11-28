@@ -22,6 +22,9 @@ namespace gdp
         GDPENGINE_API void GDP_CreateWindow(
             const char* title, const int width, const int height);
 
+        // Physics
+        GDPENGINE_API bool GDP_CollisionTest(GameObject* a, GameObject* b);
+
         // Assets
         GDPENGINE_API void GDP_LoadTexture(
             unsigned int& id, const char* filepath);
@@ -41,6 +44,12 @@ namespace gdp
         // Game World
         GDPENGINE_API GameObject* GDP_CreateGameObject();
         GDPENGINE_API void GDP_SetCameraTarget(GameObject* go);
+        
+        // Camera
+        GDPENGINE_API void SetCameraPosition(const glm::vec3& position);
+        GDPENGINE_API void SetCameraFacingDirection(const glm::vec3& direction);
+        GDPENGINE_API void GetCameraPosition(glm::vec3& position);
+        GDPENGINE_API void GetCameraFacingDirection(glm::vec3& direction);
 
         // User Input
         GDPENGINE_API bool GDP_IsKeyHeldDown(unsigned char key);

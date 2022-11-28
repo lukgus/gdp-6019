@@ -50,5 +50,23 @@ private:
 	unsigned int m_ShipModelId;
 	PhysicsDebugRenderer* m_PhysicsDebugRenderer;
 
+	int m_PrevMouseX;
+	int m_PrevMouseY;
+	int m_CurrMouseX;
+	int m_CurrMouseY;
+	int m_MouseDownX;
+	int m_MouseDownY;
+
+	bool m_FreeMotionMouse;
+
+	Vector3 m_CameraPosition;
+	Vector3 m_CameraDirection;
+
+	float m_HorizontalAngle;
+
+	bool m_IsMouseDown;
+	bool m_WasMouseDown;
+	
+
 	gdp::GameObject* m_BigShipGamObject;
 };

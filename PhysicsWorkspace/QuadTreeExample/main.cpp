@@ -101,14 +101,11 @@ public:
 
 	bool TestTriangleChild(Triangle2D* triangle, unsigned int childIndex) {
 		QuadTreeNode* childNode = child[childIndex];
-		float p0, p1, p2, r;
+		
+		// Test if any of the points of the triangle are within the extents of the 
+		// childNode.
 
 
-		Point2D v0 = triangle->a - childNode->position;
-		Point2D v1 = triangle->b - childNode->position;
-		Point2D v2 = triangle->c - childNode->position;
-
-		float f0 = v1 - v0;
 	}
 
 	void addTriangle(Triangle2D* triangle, unsigned int maxDepth) {
