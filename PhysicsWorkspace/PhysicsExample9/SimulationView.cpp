@@ -455,7 +455,7 @@ void SimulationView::Update(double dt) {
 		deltaMouseY = m_CurrMouseY - MouseStaticPosY;
 	}
 
-	printf("%d %d -> %d %d\n", m_CurrMouseX, m_CurrMouseY, deltaMouseX, deltaMouseY);
+	//printf("%d %d -> %d %d\n", m_CurrMouseX, m_CurrMouseY, deltaMouseX, deltaMouseY);
 
 	const float rotateSpeed = 0.01f;
 	m_HorizontalAngle -= deltaMouseX * rotateSpeed;
@@ -561,15 +561,39 @@ void SimulationView::Update(double dt) {
 
 
 			// Calculate our position in world space
-			glm::vec3 pointInWorldSpace = glm::unProject(cursorPositionOnScreenSpace, viewMatrix, projectionMatrix, viewport);
+			glm::vec3 pointInWorldSpace = glm::unProject(
+				cursorPositionOnScreenSpace, 
+				viewMatrix, 
+				projectionMatrix, 
+				viewport
+			);
 
 
 			// Using the point in World space and the Camera Position
 			// We can calculate a direction to use for a Ray
-			Ray ray(m_CameraPosition, pointInWorldSpace);
+
+			// This debug info should tell us our ray is facing the wrong way.
+			//CreateBall(m_CameraPosition, .2f);
+			//CreateBall(pointInWorldSpace, .1f);
+
+
+			// This should be the fix:
+			// Make pointInWorldSpace a direction instead
+			glm::vec3 direction = pointInWorldSpace - m_CameraPosition.GetGLM();
+
+			
+
+			Ray ray(m_CameraPosition, direction);
 
 
 			PhysicsObject* hitObject;
+
+			//printf("CameraPosition: %.2f, %.2f, %.2f\nDirection: %.2f, %.2f, %.2f\n",
+			//	m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z,
+			//	m_CameraDirection.x, m_CameraDirection.y, m_CameraDirection.z
+			//);
+
+
 
 			if (FirstObject && m_PhysicsSystem.RayCastFirstFound(ray, &hitObject)) {
 				hitObject->ApplyForce(Vector3(0.0f, 2000.0f, 0.0f));
@@ -596,8 +620,8 @@ void SimulationView::Update(double dt) {
 			//}
 
 
-			Vector3 debugPoint = m_CameraPosition + cursorPositionOnScreenSpace;
-			CreateBall(debugPoint, .01f);
+			//Vector3 debugPoint = m_CameraPosition + cursorPositionOnScreenSpace;
+			//CreateBall(debugPoint, .01f);
 			//printf("\n");
 			//printf("Debug: (%.2f, %.2f, %.2f)\n", debugPoint.x, debugPoint.y, debugPoint.z);
 			//printf("MousePosition: (%d, %d)\n", m_CurrMouseX, m_CurrMouseY);
